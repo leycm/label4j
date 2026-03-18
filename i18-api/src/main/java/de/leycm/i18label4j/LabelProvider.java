@@ -61,11 +61,14 @@ public interface LabelProvider extends Instanceable {
     @NonNull String translate(@NonNull String key, @NonNull Locale locale,
                               @NonNull Function<Locale, String> fallback);
 
-    <T> @NonNull T serialize(@NonNull Label label, @NonNull Class<T> type) throws SerializationException;
+    <T> @NonNull T serialize(@NonNull Label label, @NonNull Class<T> type)
+            throws SerializationException;
 
-    <T> @NonNull Label deserialize(@NonNull T serialized) throws DeserializationException;
+    <T> @NonNull Label deserialize(@NonNull T serialized)
+            throws DeserializationException;
 
-    <T> @NonNull T format(@NonNull String input, @NonNull Class<T> type) throws FormatException;
+    <T> @NonNull T format(@NonNull String input, @NonNull Class<T> type)
+            throws FormatException;
 
     void clearCache();
 

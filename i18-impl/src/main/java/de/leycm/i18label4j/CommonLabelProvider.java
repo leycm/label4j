@@ -1,3 +1,13 @@
+/*
+ * This file is part of the i18label4j Library.
+ *
+ * Licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0)
+ * You should have received a copy of the license in LICENSE.LGPL
+ * If not, see https://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ * Copyright 2026 (c) leycm <leycm@proton.me>
+ * Copyright 2026 (c) maintainers
+ */
 package de.leycm.i18label4j;
 
 import de.leycm.i18label4j.exception.*;
@@ -25,7 +35,7 @@ public class CommonLabelProvider implements LabelProvider {
         private Builder() {
             this.serializerRegistry = new ConcurrentHashMap<>();
             this.defaultMappingRule = MappingRule.FSTRING;
-            this.defaultLocale = Locale.US; // note: may use Locale.getDefault()
+            this.defaultLocale = Locale.getDefault();
         }
 
         public Builder withSerializer(final @NonNull Class<?> type,
