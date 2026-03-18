@@ -1,12 +1,10 @@
 import java.util.Properties
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.toolchain.JavaLanguageVersion
-import org.gradle.plugins.signing.SigningExtension
 
 plugins {
     java
     `maven-publish`
-    signing
     alias(libs.plugins.lombok) apply false
 }
 
@@ -63,13 +61,13 @@ allprojects {
         maven("https://libraries.minecraft.net")
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://repo.codemc.io/repository/maven-snapshots/")
+        maven("https://leycm.github.io/repository/")
     }
 }
 
 subprojects {
     apply(plugin = "java")
     apply(plugin = "maven-publish")
-    apply(plugin = "signing")
     apply(plugin = "io.freefair.lombok")
 
     java {
@@ -142,75 +140,24 @@ subprojects {
         }
 
         repositories {
-
             maven {
-
-                name = "OSSRH"
-
-                val releases =
-                    "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                val snapshots =
-                    "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-
-                url = uri(
-                    if (version.toString().endsWith("SNAPSHOT"))
-                        snapshots
-                    else
-                        releases
-                )
-
-                credentials {
-
-                    username = env("OSSRH_USERNAME")
-                    password = env("OSSRH_PASSWORD")
-                }
+                name = "leycm-repo"
+                val repoDir = rootProject.projectDir.parentFile.resolve("repository")
+                url = uri(repoDir)
             }
         }
     }
 
-    configure<SigningExtension> {
+    tasks.register<Exec>("updateRepo") {
+        println("Running push script in repository directory...")
+        val repoDir = rootProject.projectDir.parentFile.resolve("repository")
+        val script = repoDir.resolve("publish.sh")
 
-        val signingKey = env("SIGNING_KEY")
-        val signingPassword = env("SIGNING_PASSWORD")
-
-        if (signingKey != null && signingPassword != null) {
-
-            useInMemoryPgpKeys(signingKey, signingPassword)
-
-            sign(extensions.getByType<PublishingExtension>().publications)
-        }
+        workingDir = repoDir
+        commandLine("sh", script.absolutePath)
     }
-}
 
-// Custom Build Task
-tasks.register("collect") {
-
-    group = "build"
-    description = "Builds all platform variants and copies them into build/out"
-
-    dependsOn(subprojects.mapNotNull { it.tasks.findByName("build") })
-
-    doLast {
-
-        val outDir = rootProject.file("out").apply { mkdirs() }
-
-        subprojects
-            .filter { it.name != "api" }
-            .forEach { project ->
-
-                val jar = project.layout.buildDirectory
-                    .file("libs/${rootProject.name}-${project.name}-${project.version}.jar")
-                    .get()
-                    .asFile
-
-                if (jar.exists()) {
-
-                    jar.copyTo(outDir.resolve(jar.name), overwrite = true)
-
-                    println("> Copied ${jar.name} -> build/out/")
-                }
-            }
-
-        println("[*] All plugin builds finished and moved to build/out/")
+    tasks.named("publish") {
+        finalizedBy("updateRepo")
     }
 }
