@@ -54,6 +54,9 @@ public class MappingRule {
     /** Minecraft Legacy style: {@code §:variable} */
     public static final @NonNull MappingRule MINECRAFT_LEGACY = new MappingRule("§:", "");
 
+    private static final String ESCAPED_PREFIX = "\u0000P";
+    private static final String ESCAPED_SUFFIX = "\u0000S";
+
     private final String prefix;
     private final String suffix;
     private final Pattern pattern;
@@ -74,9 +77,6 @@ public class MappingRule {
     public String apply(final @NonNull String s, final @NonNull Set<Mapping> mappings) {
         if (mappings.isEmpty()) return s;
 
-        final String ESCAPED_PREFIX = "\u0000P";
-        final String ESCAPED_SUFFIX = "\u0000S";
-
         String result = s
                 .replace("\\" + prefix, ESCAPED_PREFIX)
                 .replace("\\" + suffix, ESCAPED_SUFFIX);
@@ -85,24 +85,23 @@ public class MappingRule {
         StringBuilder sb = new StringBuilder();
 
         while (matcher.find()) {
-            String key = matcher.group(1);
+            final String key = matcher.group(1);
 
             String replacement = null;
-            for (Mapping mapping : mappings) {
-                if (mapping.key().equals(key)) {
-                    replacement = mapping.valueAsString();
-                    break;
-                }
+
+            for (final Mapping mapping : mappings) {
+                if (!mapping.key().equals(key)) continue;
+                replacement = mapping.valueAsString();
+                break;
             }
 
-            if (replacement == null) {
-                matcher.appendReplacement(sb, matcher.group(0));
-            } else {
-                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-            }
+            final String finalReplacement = Objects
+                    .requireNonNullElse(replacement, matcher.group(0));
+
+            matcher.appendReplacement(sb, finalReplacement);
         }
-        matcher.appendTail(sb);
 
+        matcher.appendTail(sb);
         result = sb.toString();
 
         result = result
