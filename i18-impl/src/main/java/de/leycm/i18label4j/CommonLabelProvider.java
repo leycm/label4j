@@ -37,7 +37,7 @@ public class CommonLabelProvider implements LabelProvider {
 
         private Builder() {
             this.serializerRegistry = new ConcurrentHashMap<>();
-            this.defaultMappingRule = MappingRule.FSTRING;
+            this.defaultMappingRule = MappingRule.DOLLAR_CURLY;
             this.defaultLocale = Locale.getDefault();
         }
 

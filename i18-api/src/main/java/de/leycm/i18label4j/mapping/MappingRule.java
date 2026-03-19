@@ -13,35 +13,46 @@ package de.leycm.i18label4j.mapping;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Getter
 public class MappingRule {
 
-    /**
-     * Dollar-style placeholder pattern: {@code ${variable}}
-     */
-    public static final @NonNull MappingRule DOLLAR = new MappingRule("${", "}");
+    /** Double Curly style: {@code {{variable}}} (Vue, Handlebars, Jinja) */
+    public static final @NonNull MappingRule DOUBLE_CURLY = new MappingRule("{{", "}}");
 
-    /**
-     * Percent-style placeholder pattern: {@code %variable%}
-     */
+    /** Dollar Curly style: {@code ${variable}} (ES6, Kotlin, Bash-Strings) */
+    public static final @NonNull MappingRule DOLLAR_CURLY = new MappingRule("${", "}");
+
+    /** Section style: {@code §{variable}} (Custom/Legacy) */
+    public static final @NonNull MappingRule SECTION_CURLY = new MappingRule("§{", "}");
+
+    /** Tag style: {@code <variable>} (XML/HTML-ish) */
+    public static final @NonNull MappingRule TAG = new MappingRule("<", ">");
+
+    /** Curly style: {@code {variable}} (MessageFormat, Python f-strings) */
+    public static final @NonNull MappingRule CURLY = new MappingRule("{", "}");
+
+    /** Percent style: {@code %variable%} (Windows Environment, Batch) */
     public static final @NonNull MappingRule PERCENT = new MappingRule("%", "%");
 
-    /**
-     * F-string style placeholder pattern: {@code %variable}
-     */
-    public static final @NonNull MappingRule FSTRING = new MappingRule("%", "");
+    /** Bracket style: {@code [variable]} (BBCode, Wiki-Syntax) */
+    public static final @NonNull MappingRule BRACKET = new MappingRule("[", "]");
 
-    /**
-     * Curly brace placeholder pattern: {@code {{variable}}}
-     */
-    public static final @NonNull MappingRule CURLY = new MappingRule("{{", "}}");
+    /** Shell style: {@code $variable} (Unix Shell, PHP) */
+    public static final @NonNull MappingRule SHELL = new MappingRule("$", "");
 
-    /**
-     * MiniMessage style placeholder pattern: {@code <var:variable>}
-     */
+    /** Format String style: {@code %variable} (C-style, String.format) */
+    public static final @NonNull MappingRule FORMAT_STRING = new MappingRule("%", "");
+
+    /** MiniMessage style: {@code <var:variable>} (Adventure/Kyori) */
     public static final @NonNull MappingRule MINI_MESSAGE = new MappingRule("<var:", ">");
+
+    /** Minecraft Legacy style: {@code §:variable} */
+    public static final @NonNull MappingRule MINECRAFT_LEGACY = new MappingRule("§:", "");
 
     private final String prefix;
     private final String suffix;
@@ -58,6 +69,65 @@ public class MappingRule {
                     + "([^" + Pattern.quote(suffix.substring(0, 1)) + "]+)"
                     + Pattern.quote(suffix));
         }
+    }
+
+    public String apply(final @NonNull String s, final @NonNull Set<Mapping> mappings) {
+        if (mappings.isEmpty()) return s;
+
+        final String ESCAPED_PREFIX = "\u0000P";
+        final String ESCAPED_SUFFIX = "\u0000S";
+
+        String result = s
+                .replace("\\" + prefix, ESCAPED_PREFIX)
+                .replace("\\" + suffix, ESCAPED_SUFFIX);
+
+        Matcher matcher = pattern.matcher(result);
+        StringBuilder sb = new StringBuilder();
+
+        while (matcher.find()) {
+            String key = matcher.group(1);
+
+            String replacement = null;
+            for (Mapping mapping : mappings) {
+                if (mapping.key().equals(key)) {
+                    replacement = mapping.valueAsString();
+                    break;
+                }
+            }
+
+            if (replacement == null) {
+                matcher.appendReplacement(sb, matcher.group(0));
+            } else {
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+            }
+        }
+        matcher.appendTail(sb);
+
+        result = sb.toString();
+
+        result = result
+                .replace(ESCAPED_PREFIX, prefix)
+                .replace(ESCAPED_SUFFIX, suffix);
+
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return MappingRule.class.getSimpleName() + "@" + prefix + "variable" + suffix;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        MappingRule that = (MappingRule) obj;
+        return prefix.equals(that.prefix) && suffix.equals(that.suffix);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(prefix, suffix);
     }
 
 }

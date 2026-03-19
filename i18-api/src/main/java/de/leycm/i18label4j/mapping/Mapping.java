@@ -12,42 +12,35 @@ package de.leycm.i18label4j.mapping;
 
 import lombok.NonNull;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
-public record Mapping(@NonNull MappingRule rule,
-                      @NonNull String key,
-                      @NonNull Supplier<String> value
+public record Mapping(@NonNull String key,
+                      @NonNull Supplier<Object> value
 ) {
 
-    public static @NonNull String apply(final @NonNull Set<Mapping> mappings,
-                                        final @NonNull String text) {
-        if (mappings.isEmpty()) return text;
-
-        String result = text;
-
-        for (final Mapping mapping : mappings)
-            result = mapping.apply(result);
-
-        return result;
+    public String valueAsString() {
+        return String.valueOf(value.get());
     }
 
-    public @NonNull String apply(final @NonNull String text) {
-        final var matcher = rule.getPattern().matcher(text);
-        final var result = new StringBuilder(text.length());
+    @Override
+    public String toString() {
+        return Mapping.class.getSimpleName() + "{" +
+                "key=\"" + key + '\"' +
+                ", value=" + value.get() +
+                '}';
+    }
 
-        int lastEnd = 0;
-        while (matcher.find()) {
-            if (!matcher.group(1).equals(key)) continue;
-            result.append(text, lastEnd, matcher.start());
-            result.append(value.get());
-            lastEnd = matcher.end();
-        }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Mapping mapping = (Mapping) obj;
+        return key.equals(mapping.key);
+    }
 
-        if (lastEnd == 0) return text;
-
-        result.append(text, lastEnd, text.length());
-        return result.toString();
+    @Override
+    public int hashCode() {
+        return key.hashCode();
     }
 
 }

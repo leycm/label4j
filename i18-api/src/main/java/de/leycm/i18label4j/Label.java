@@ -32,13 +32,7 @@ public interface Label {
 
     default @NonNull Label mapTo(final @NonNull String key,
                                  final @NonNull Supplier<Object> supplier) {
-        return mapTo(getProvider().getDefaultMappingRule(), key, supplier);
-    }
-
-    default @NonNull Label mapTo(final @NonNull MappingRule rule,
-                                 final @NonNull String key,
-                                 final @NonNull Supplier<Object> supplier) {
-        return mapTo(new Mapping(rule, key, () -> String.valueOf(supplier.get())));
+        return mapTo(new Mapping(key, () -> String.valueOf(supplier.get())));
     }
 
     @NonNull Label mapTo(final @NonNull Mapping mapping);
@@ -70,7 +64,7 @@ public interface Label {
     }
 
     default @NonNull String mapped(@NonNull Locale locale) {
-        return Mapping.apply(getMappings(), in(locale));
+        return getProvider().getDefaultMappingRule().apply(in(locale), getMappings());
     }
 
     default <T> @NonNull T serialize(Class<T> type) {
