@@ -14,12 +14,16 @@ import lombok.NonNull;
 
 public class IncompatibleMatchException extends ClassCastException {
 
+    public IncompatibleMatchException(final @NonNull String message) {
+        super(message);
+    }
+
     public IncompatibleMatchException(final @NonNull Class<?> type) {
         super("Serializer for type " + type.getName() + " returned incompatible type");
     }
 
     public IncompatibleMatchException(final @NonNull Class<?> type, final @NonNull Throwable cause) {
-        super(String.format("Serializer for type " + type.getName() + " returned incompatible type: %f", cause.getMessage()));
+        super(String.format("Serializer for type " + type.getName() + " returned incompatible type: %s", cause.getMessage()));
     }
 
 }

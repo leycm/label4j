@@ -16,6 +16,7 @@ import de.leycm.i18label4j.label.LocaleLabel;
 import de.leycm.i18label4j.mapping.MappingRule;
 import de.leycm.i18label4j.serialize.LabelSerializer;
 import de.leycm.i18label4j.source.LocalizationSource;
+
 import lombok.NonNull;
 import org.jetbrains.annotations.Contract;
 
@@ -117,7 +118,8 @@ public class CommonLabelProvider implements LabelProvider {
     }
 
     @Override
-    public @NonNull String translate(@NonNull String key, @NonNull Locale locale, @NonNull Function<Locale, String> fallback) {
+    public @NonNull String translate(@NonNull String key, @NonNull Locale locale,
+                                     @NonNull Function<Locale, String> fallback) {
 
         final AtomicReference<RuntimeException> exception = new AtomicReference<>();
 
@@ -127,7 +129,7 @@ public class CommonLabelProvider implements LabelProvider {
 
         Map<String, String> localeMap = translationCache.computeIfAbsent(
                 localeTag,
-                tag -> loadTranslationsSafe(locale, exception)
+                tag -> getLocalization(locale, exception)
         );
 
         String value = localeMap.get(key);
@@ -142,7 +144,7 @@ public class CommonLabelProvider implements LabelProvider {
 
             Map<String, String> defaultMap = translationCache.computeIfAbsent(
                     defaultTag,
-                    tag -> loadTranslationsSafe(defaultLocale, exception)
+                    tag -> getLocalization(defaultLocale, exception)
             );
 
             String defaultValue = defaultMap.get(key);
@@ -169,8 +171,9 @@ public class CommonLabelProvider implements LabelProvider {
     }
 
     @Contract("_, _ -> new")
-    private @NonNull Map<String, String> loadTranslationsSafe(@NonNull Locale locale,
-                                                              @NonNull AtomicReference<RuntimeException> exception) {
+    private @NonNull Map<String, String> getLocalization(@NonNull Locale locale,
+                                                         @NonNull AtomicReference<RuntimeException> exception)
+            throws NullPointerException {
         try {
             Map<String, String> translations = localizationSource.getLocalization(locale);
             return new ConcurrentHashMap<>(translations);
@@ -182,17 +185,21 @@ public class CommonLabelProvider implements LabelProvider {
 
     @Contract("_, _ -> fail")
     private void throwCachedException(final @NonNull String localeTag,
-                                      final @NonNull AtomicReference<RuntimeException> exception) {
-        throw new RuntimeException(
+                                      final @NonNull AtomicReference<RuntimeException> exception)
+            throws NullPointerException, IllegalArgumentException  {
+        throw new IllegalArgumentException(
                 "Failed to load translations for locale \"" + localeTag
-                        + "\"; failure is cached and will not be retried until the cache is cleared",
+                        + "\"; an empty map is cached due to the failure, "
+                        + "translation attempts will not re-attempt loading"
+                        + "until the cache is cleared",
                 exception.get()
         );
     }
 
     @Override
     public @NonNull <T> T serialize(final @NonNull Label label,
-                                    final @NonNull Class<T> type) {
+                                    final @NonNull Class<T> type)
+            throws SerializationException, IllegalArgumentException {
         LabelSerializer<?> serializer = serializerRegistry.get(type);
 
         if (serializer == null)
@@ -203,7 +210,8 @@ public class CommonLabelProvider implements LabelProvider {
     }
 
     @Override
-    public @NonNull <T> Label deserialize(@NonNull T serialized) throws DeserializationException {
+    public @NonNull <T> Label deserialize(@NonNull T serialized)
+            throws DeserializationException, IllegalArgumentException  {
         Class<?> type = serialized.getClass();
         LabelSerializer<T> serializer = getSafeSerializer(type);
 
@@ -214,7 +222,8 @@ public class CommonLabelProvider implements LabelProvider {
     }
 
     @Override
-    public @NonNull <T> T format(@NonNull String input, @NonNull Class<T> type) throws FormatException {
+    public @NonNull <T> T format(@NonNull String input, @NonNull Class<T> type)
+            throws FormatException, IllegalArgumentException  {
         LabelSerializer<?> serializer = serializerRegistry.get(type);
 
         if (serializer == null)
@@ -240,8 +249,11 @@ public class CommonLabelProvider implements LabelProvider {
 
     @Override
     public void clearCache(@NonNull Locale locale) {
-        if (translationCache.containsKey(locale.toLanguageTag()))
-            translationCache.get(locale.toLanguageTag()).clear();
+        translationCache.computeIfPresent(locale.toLanguageTag(),
+                (tag, map) -> {
+            map.clear();
+            return map;
+        });
     }
 
     @Override

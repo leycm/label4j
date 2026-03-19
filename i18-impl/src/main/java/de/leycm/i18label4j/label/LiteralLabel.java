@@ -13,26 +13,44 @@ package de.leycm.i18label4j.label;
 import de.leycm.i18label4j.Label;
 import de.leycm.i18label4j.LabelProvider;
 import de.leycm.i18label4j.mapping.Mapping;
+
 import lombok.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 
-public record LiteralLabel(
-        @NonNull LabelProvider provider,
-        @NonNull Set<Mapping> mappings,
-        @NonNull String literal
-) implements Label {
-
-    public LiteralLabel { }
+@SuppressWarnings("ClassCanBeRecord") // cause: mutable mappings
+public class LiteralLabel implements Label {
+    private final @NonNull LabelProvider provider;
+    private final @NonNull Set<Mapping> mappings;
+    private final @NonNull String literal;
 
     public LiteralLabel(@NonNull LabelProvider provider,
                         @NonNull String literal) {
         this(provider, new HashSet<>(), literal);
     }
 
+    @ApiStatus.Internal
+    public LiteralLabel(@NonNull LabelProvider provider,
+                        @NonNull Set<Mapping> mappings,
+                        @NonNull String literal) {
+        this.provider = provider;
+        this.mappings = mappings;
+        this.literal = literal;
+    }
+
     @Override
-    public @NonNull Set<Mapping> mappings() {
+    public @NonNull LabelProvider getProvider() {
+        return provider;
+    }
+
+    @Override
+    public @NonNull Set<Mapping> getMappings() {
         return Collections.unmodifiableSet(mappings);
+    }
+
+    public @NonNull String getLiteral() {
+        return literal;
     }
 
     @Override
@@ -48,9 +66,11 @@ public record LiteralLabel(
 
     @Override
     public @NonNull String toString() {
-        try {return serialize();
+        try {
+            return serialize(String.class);
         } catch (Throwable e) {
-            return Objects.toString(this);
+            return LiteralLabel.class.getSimpleName() +
+                    "@" + Integer.toHexString(hashCode());
         }
     }
 
@@ -59,12 +79,13 @@ public record LiteralLabel(
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         LiteralLabel that = (LiteralLabel) obj;
-        return provider.equals(that.provider()) &&
-                literal.equals(that.literal());
+        return provider.equals(that.getProvider()) &&
+                literal.equals(that.getLiteral());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(provider, literal);
     }
+
 }

@@ -21,9 +21,9 @@ import java.util.function.Supplier;
 
 public interface Label {
 
-    @NonNull LabelProvider provider();
+    @NonNull LabelProvider getProvider();
 
-    @NonNull Set<Mapping> mappings();
+    @NonNull Set<Mapping> getMappings();
 
     default @NonNull Label mapTo(final @NonNull String key,
                                  final @NonNull Object value) {
@@ -32,7 +32,7 @@ public interface Label {
 
     default @NonNull Label mapTo(final @NonNull String key,
                                  final @NonNull Supplier<Object> supplier) {
-        return mapTo(provider().getDefaultMappingRule(), key, supplier);
+        return mapTo(getProvider().getDefaultMappingRule(), key, supplier);
     }
 
     default @NonNull Label mapTo(final @NonNull MappingRule rule,
@@ -44,37 +44,37 @@ public interface Label {
     @NonNull Label mapTo(final @NonNull Mapping mapping);
 
     default @NonNull String in() {
-        return in(provider().getDefaultLocale());
+        return in(getProvider().getDefaultLocale());
     }
 
     default <T> @NonNull T in(final @NonNull Class<T> type) {
-        return in(provider().getDefaultLocale(), type);
+        return in(getProvider().getDefaultLocale(), type);
     }
 
     default <T> @NonNull T in(@NonNull Locale locale, final @NonNull Class<T> type) {
-        return provider().format(in(locale), type);
+        return getProvider().format(in(locale), type);
     }
 
     @NonNull String in(@NonNull Locale locale);
 
     default @NonNull String mapped() {
-        return mapped(provider().getDefaultLocale());
+        return mapped(getProvider().getDefaultLocale());
     }
 
     default <T> @NonNull T mapped(final @NonNull Class<T> type) {
-        return mapped(provider().getDefaultLocale(), type);
+        return mapped(getProvider().getDefaultLocale(), type);
     }
 
     default <T> @NonNull T mapped(final @NonNull Locale locale, final @NonNull Class<T> type) {
-        return provider().format(mapped(locale), type);
+        return getProvider().format(mapped(locale), type);
     }
 
     default @NonNull String mapped(@NonNull Locale locale) {
-        return Mapping.apply(mappings(), in(locale));
+        return Mapping.apply(getMappings(), in(locale));
     }
 
-    default @NonNull String serialize() {
-        return provider().serialize(this, String.class);
+    default <T> @NonNull T serialize(Class<T> type) {
+        return getProvider().serialize(this, type);
     }
 
     @Override

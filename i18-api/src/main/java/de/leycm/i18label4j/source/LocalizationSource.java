@@ -20,6 +20,7 @@ public interface LocalizationSource extends Iterable<Locale> {
 
     @NonNull Set<Locale> getLocalizations();
 
+    // note: the Exception behavior should be defined by the implementation
     @NonNull Map<String, String> getLocalization(@NonNull Locale locale) throws Exception;
 
     // note: logic can and should in some cases be replaced by a more efficient implementation
