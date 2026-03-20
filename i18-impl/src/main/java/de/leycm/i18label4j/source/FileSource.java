@@ -102,11 +102,11 @@ public final class FileSource implements LocalizationSource {
     @Override
     public @NonNull Map<String, String> getLocalization(final @NonNull Locale locale)
             throws Exception {
-        String tag = locale.toLanguageTag().replace("-", "_");
+        String tag = locale.toLanguageTag().replace("-", "_").toLowerCase();
         URI file = resolve(directory, tag + "." + parser.extension());
 
         if (!FileUtils.isFile(file)) {
-            throw new NoSuchElementException("No file for locale: " + locale);
+            throw new NoSuchElementException("No file for locale: " + locale + " (expected: " + file + ")");
         }
         return parser.parse(file);
     }
