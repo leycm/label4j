@@ -21,9 +21,9 @@ import java.util.*;
 
 @SuppressWarnings("ClassCanBeRecord") // cause: mutable mappings
 public class LiteralLabel implements Label {
-    private final @NonNull LabelProvider provider;
-    private final @NonNull Set<Mapping> mappings;
-    private final @NonNull String literal;
+    private final LabelProvider provider;
+    private final Set<Mapping> mappings;
+    private final String literal;
 
     public LiteralLabel(final @NonNull LabelProvider provider,
                         final @NonNull String literal) {
