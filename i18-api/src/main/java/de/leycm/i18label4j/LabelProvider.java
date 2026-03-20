@@ -46,7 +46,7 @@ public interface LabelProvider extends Instanceable {
 
     default void warmUp(final @NonNull Locale @NonNull ... localizations) {
         for (Locale locale : localizations) {
-            // note: using the key "__warmup__" is a bit hacky, but it dont matter because it is handled normally anyway
+            // note: using the key "__warmup__" to cache the actual translations there still can be a translation called "__warmup__".
             translate(locale, "__warmup__", "__warmup__");
         }
     }
