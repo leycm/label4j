@@ -159,7 +159,7 @@ public class MappingRule {
      * the mappings and the compiled {@link #pattern} is applied.</p>
      *
      * <p>Escape sequences — a backslash immediately before the prefix —
-     * are protected before substitution and restored afterwards, allowing
+     * are protected before substitution and restored afterward, allowing
      * callers to include literal prefix characters in the output.</p>
      *
      * <p>The method enforces two safety limits: inputs longer than
