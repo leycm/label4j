@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 public final class FileUtils {
 
-    private static final String LS_FILE = ".ls";
+    private static final String LS_FILE = ".dir";
 
     private FileUtils() {}
 
@@ -109,7 +109,7 @@ public final class FileUtils {
         }
     }
 
-    private static Set<URI> readDirRemote(URI uri) {
+    private static @NonNull Set<URI> readDirRemote(URI uri) {
         String base = ensureTrailingSlash(uri.toString());
         String lsContent = readFileRemote(URI.create(base + LS_FILE));
         Set<URI> children = new HashSet<>();

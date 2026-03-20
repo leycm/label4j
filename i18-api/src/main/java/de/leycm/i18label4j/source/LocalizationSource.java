@@ -24,8 +24,9 @@ public interface LocalizationSource extends Iterable<Locale> {
     // note: the Exception behavior should be defined by the implementation
     @NonNull Map<String, String> getLocalization(@NonNull Locale locale) throws Exception;
 
-    // note: logic can and should in some cases be replaced by a more efficient implementation
+
     default boolean containsLocalization(@NonNull Locale locale) {
+        // note: logic can an should be replaced with a more efficient implementation
         return getLocalizations().contains(locale);
     }
 
