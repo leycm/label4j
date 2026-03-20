@@ -70,7 +70,7 @@ public class LiteralLabel implements Label {
         try {
             return serialize(String.class);
         } catch (Throwable e) {
-            return LiteralLabel.class.getSimpleName() +
+            return getClass().getSimpleName() +
                     "@" + Integer.toHexString(hashCode());
         }
     }

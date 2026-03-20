@@ -12,6 +12,7 @@ package de.leycm.i18label4j.source;
 
 import lombok.NonNull;
 
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,11 @@ public interface LocalizationSource extends Iterable<Locale> {
     // note: logic can and should in some cases be replaced by a more efficient implementation
     default boolean containsLocalization(@NonNull Locale locale) {
         return getLocalizations().contains(locale);
+    }
+
+    @Override
+    default Iterator<Locale> iterator() {
+        return getLocalizations().iterator();
     }
 
 }
