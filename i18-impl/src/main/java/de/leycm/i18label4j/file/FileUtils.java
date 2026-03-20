@@ -27,12 +27,51 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Static utility class for reading files and directories from multiple
+ * URI schemes.
+ *
+ * <p>{@link FileUtils} abstracts over three URI schemes so that
+ * localization files can be loaded transparently from the JVM classpath
+ * ({@code resource://}), the local file system ({@code file://}), or a
+ * remote HTTP/HTTPS server ({@code http://} / {@code https://}).
+ * All public methods dispatch on the scheme of the supplied {@link URI}
+ * and delegate to the appropriate private scheme-specific implementation.</p>
+ *
+ * <p>For remote directories the implementation expects a {@code .dir}
+ * listing file whose lines each name one child entry (file or directory).
+ * This convention allows directory enumeration without server-side
+ * directory listing support.</p>
+ *
+ * <p>Thread Safety: All methods are stateless and therefore thread-safe.</p>
+ *
+ * @since 1.0.0
+ * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
+ */
 public final class FileUtils {
 
+    // Filename of the remote directory listing file
     private static final String LS_FILE = ".dir";
 
+    /** Utility class — not instantiable. */
     private FileUtils() {}
 
+    /**
+     * Returns the set of child {@link URI}s contained in the directory
+     * at {@code uri}.
+     *
+     * <p>The returned URIs reference both files and sub-directories
+     * directly inside the given directory — no recursive traversal is
+     * performed.</p>
+     *
+     * @param uri the directory URI; must not be {@code null}
+     * @return a set of child URIs; never {@code null}, may be empty
+     * @throws IllegalArgumentException if the URI scheme is not
+     *         {@code resource}, {@code file}, {@code http}, or
+     *         {@code https}; or if the URI does not point to a directory
+     * @throws RuntimeException if listing the directory fails for any
+     *                          IO or JAR-access reason
+     */
     public static @NonNull Set<URI> readDir(final @NonNull URI uri) {
         return switch (uri.getScheme()) {
             case "resource" -> readDirResource(uri);
@@ -42,6 +81,14 @@ public final class FileUtils {
         };
     }
 
+    /**
+     * Reads and returns the full text content of the file at {@code uri}.
+     *
+     * @param uri the file URI; must not be {@code null}
+     * @return the file contents as a string; never {@code null}
+     * @throws IllegalArgumentException if the URI scheme is unsupported
+     * @throws RuntimeException         if reading the file fails
+     */
     public static @NonNull String readFile(final @NonNull URI uri) {
         return switch (uri.getScheme()) {
             case "resource" -> readFileResource(uri);
@@ -51,6 +98,13 @@ public final class FileUtils {
         };
     }
 
+    /**
+     * Returns {@code true} if the given URI points to a directory.
+     *
+     * @param uri the URI to test; must not be {@code null}
+     * @return {@code true} if the URI is a directory; {@code false} otherwise
+     * @throws IllegalArgumentException if the URI scheme is unsupported
+     */
     public static boolean isDir(final @NonNull URI uri) {
         return switch (uri.getScheme()) {
             case "resource" -> isDirResource(uri);
@@ -60,6 +114,13 @@ public final class FileUtils {
         };
     }
 
+    /**
+     * Returns {@code true} if the given URI points to a regular file.
+     *
+     * @param uri the URI to test; must not be {@code null}
+     * @return {@code true} if the URI is a file; {@code false} otherwise
+     * @throws IllegalArgumentException if the URI scheme is unsupported
+     */
     public static boolean isFile(final @NonNull URI uri) {
         return switch (uri.getScheme()) {
             case "resource" -> isFileResource(uri);
@@ -69,8 +130,20 @@ public final class FileUtils {
         };
     }
 
-
-    private static Set<URI> readDirResource(URI uri) {
+    /**
+     * Lists child entries inside a classpath resource directory.
+     *
+     * <p>Supports both exploded directories (running from the file system)
+     * and JAR entries (running from a packaged JAR). In the JAR case the
+     * entry names are scanned for direct children of the given path.</p>
+     *
+     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @return a set of child URIs; never {@code null}
+     * @throws IllegalArgumentException if the resource does not exist or
+     *                                  is not a directory
+     * @throws RuntimeException         if listing fails
+     */
+    private static @NonNull Set<URI> readDirResource(final @NonNull URI uri) {
         String path = resourcePath(uri);
         URL url = FileUtils.class.getClassLoader().getResource(path);
         if (url == null) {
@@ -112,7 +185,18 @@ public final class FileUtils {
         }
     }
 
-    private static @NonNull Set<URI> readDirRemote(URI uri) {
+    /**
+     * Lists child entries inside a remote directory using the {@code .dir}
+     * listing convention.
+     *
+     * <p>Fetches the {@code .dir} file from the remote directory URI and
+     * interprets each non-empty line as the name of a child entry.</p>
+     *
+     * @param uri the remote directory URI; must not be {@code null}
+     * @return a set of child URIs; never {@code null}
+     * @throws RuntimeException if the {@code .dir} listing cannot be read
+     */
+    private static @NonNull Set<URI> readDirRemote(final @NonNull URI uri) {
         String base = ensureTrailingSlash(uri.toString());
         String lsContent = readFileRemote(URI.create(base + LS_FILE));
         Set<URI> children = new HashSet<>();
@@ -126,7 +210,17 @@ public final class FileUtils {
         return children;
     }
 
-    private static Set<URI> readDirFile(URI uri) {
+    /**
+     * Lists child entries inside a local file-system directory.
+     *
+     * @param uri the {@code file://} URI; must not be {@code null}
+     * @return a set of child URIs; never {@code null}
+     * @throws IllegalArgumentException if the path does not exist or
+     *                                  is not a directory
+     * @throws RuntimeException         if listing fails with an
+     *                                  {@link IOException}
+     */
+    private static @NonNull Set<URI> readDirFile(final @NonNull URI uri) {
         Path path = toLocalPath(uri);
         if (!Files.exists(path)) {
             throw new IllegalArgumentException("Directory does not exist: " + uri);
@@ -145,7 +239,15 @@ public final class FileUtils {
         }
     }
 
-    private static String readFileResource(URI uri) {
+    /**
+     * Reads a classpath resource file and returns its content as a string.
+     *
+     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @return the file content; never {@code null}
+     * @throws IllegalArgumentException if the resource is not found
+     * @throws RuntimeException         if reading fails
+     */
+    private static @NonNull String readFileResource(final @NonNull URI uri) {
         String path = resourcePath(uri);
         InputStream is = FileUtils.class.getClassLoader().getResourceAsStream(path);
 
@@ -153,23 +255,40 @@ public final class FileUtils {
             throw new IllegalArgumentException("Resource not found: " + path);
         }
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is, StandardCharsets.UTF_8))) {
             return reader.lines().collect(Collectors.joining("\n"));
         } catch (IOException e) {
             throw new RuntimeException("Failed to read resource: " + path, e);
         }
     }
 
-    private static String readFileRemote(URI uri) {
+    /**
+     * Fetches a remote file over HTTP/HTTPS and returns its content
+     * as a string.
+     *
+     * @param uri the remote file URI; must not be {@code null}
+     * @return the file content; never {@code null}
+     * @throws RuntimeException if the HTTP connection or reading fails
+     */
+    private static @NonNull String readFileRemote(final @NonNull URI uri) {
         try (InputStream is = uri.toURL().openStream();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+             BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(is, StandardCharsets.UTF_8))) {
             return reader.lines().collect(Collectors.joining("\n"));
         } catch (IOException e) {
             throw new RuntimeException("Failed to read remote file: " + uri, e);
         }
     }
 
-    private static String readFileFile(URI uri) {
+    /**
+     * Reads a local file and returns its content as a string.
+     *
+     * @param uri the {@code file://} URI; must not be {@code null}
+     * @return the file content; never {@code null}
+     * @throws RuntimeException if reading fails with an {@link IOException}
+     */
+    private static @NonNull String readFileFile(final @NonNull URI uri) {
         try {
             return Files.readString(toLocalPath(uri), StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -177,7 +296,14 @@ public final class FileUtils {
         }
     }
 
-    private static boolean isDirResource(URI uri) {
+    /**
+     * Returns {@code true} if the given {@code resource://} URI points
+     * to a directory inside the classpath.
+     *
+     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @return {@code true} if the URI resolves to a directory
+     */
+    private static boolean isDirResource(final @NonNull URI uri) {
         String path = resourcePath(uri);
         URL url = FileUtils.class.getClassLoader().getResource(path);
 
@@ -197,7 +323,14 @@ public final class FileUtils {
         return false;
     }
 
-    private static boolean isDirRemote(URI uri) {
+    /**
+     * Returns {@code true} if the given remote URI points to a directory
+     * (detected by the presence of a {@code .dir} listing file).
+     *
+     * @param uri the remote URI; must not be {@code null}
+     * @return {@code true} if a {@code .dir} file is accessible at the URI
+     */
+    private static boolean isDirRemote(final @NonNull URI uri) {
         String base = ensureTrailingSlash(uri.toString());
         try {
             readFileRemote(URI.create(base + LS_FILE));
@@ -207,18 +340,37 @@ public final class FileUtils {
         }
     }
 
-    private static boolean isDirFile(URI uri) {
+    /**
+     * Returns {@code true} if the local path resolves to a directory.
+     *
+     * @param uri the {@code file://} URI; must not be {@code null}
+     * @return {@code true} if the path is a directory
+     */
+    private static boolean isDirFile(final @NonNull URI uri) {
         return Files.isDirectory(toLocalPath(uri));
     }
 
-    private static boolean isFileFile(URI uri) {
+    /**
+     * Returns {@code true} if the local path resolves to a regular file.
+     *
+     * @param uri the {@code file://} URI; must not be {@code null}
+     * @return {@code true} if the path is a regular file
+     */
+    private static boolean isFileFile(final @NonNull URI uri) {
         Path path = toLocalPath(uri);
         return Files.exists(path) && Files.isRegularFile(path);
     }
 
-    private static boolean isFileRemote(URI uri) {
+    /**
+     * Returns {@code true} if the remote URI resolves to a readable file
+     * (i.e. is reachable but is not a directory).
+     *
+     * @param uri the remote URI; must not be {@code null}
+     * @return {@code true} if the URI is a readable file
+     */
+    private static boolean isFileRemote(final @NonNull URI uri) {
         try {
-            if (isDirRemote(uri)) {return false;}
+            if (isDirRemote(uri)) { return false; }
             readFileRemote(uri);
             return true;
         } catch (Exception e) {
@@ -226,7 +378,14 @@ public final class FileUtils {
         }
     }
 
-    private static boolean isFileResource(URI uri) {
+    /**
+     * Returns {@code true} if the {@code resource://} URI resolves to a
+     * classpath file (not a directory).
+     *
+     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @return {@code true} if the resource is a regular file
+     */
+    private static boolean isFileResource(final @NonNull URI uri) {
         String path = resourcePath(uri);
         URL url = FileUtils.class.getClassLoader().getResource(path);
 
@@ -246,7 +405,16 @@ public final class FileUtils {
         return false;
     }
 
-    private static String resourcePath(URI uri) {
+    /**
+     * Extracts the classpath-relative path from a {@code resource://} URI.
+     *
+     * <p>Strips leading slashes so the path is suitable for
+     * {@link ClassLoader#getResourceAsStream(String)}.</p>
+     *
+     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @return the cleaned path string; never {@code null}
+     */
+    private static @NonNull String resourcePath(final @NonNull URI uri) {
         StringBuilder path = new StringBuilder();
 
         if (uri.getHost() != null) {
@@ -266,19 +434,44 @@ public final class FileUtils {
         return result;
     }
 
-    private static URI createResourceUri(String path) {
-        path = path.replaceAll("^/+", "");
-        return URI.create("resource://" + path);
+    /**
+     * Creates a {@code resource://} URI from the given classpath path.
+     *
+     * <p>Leading slashes are stripped before constructing the URI.</p>
+     *
+     * @param path the classpath path; must not be {@code null}
+     * @return the constructed {@code resource://} URI; never {@code null}
+     */
+    private static @NonNull URI createResourceUri(final @NonNull String path) {
+        String cleaned = path.replaceAll("^/+", "");
+        return URI.create("resource://" + cleaned);
     }
 
-    private static Path toLocalPath(URI uri) {
+    /**
+     * Converts a {@code file://} or scheme-less {@link URI} to a
+     * {@link Path}.
+     *
+     * <p>If the URI has no scheme, only its path component is used to
+     * create the {@link Path}.</p>
+     *
+     * @param uri the URI to convert; must not be {@code null}
+     * @return the corresponding {@link Path}; never {@code null}
+     */
+    private static @NonNull Path toLocalPath(final @NonNull URI uri) {
         if (uri.getScheme() == null) {
             return Paths.get(uri.getPath());
         }
         return Paths.get(uri);
     }
 
-    private static String ensureTrailingSlash(String uri) {
+    /**
+     * Ensures the string representation of {@code uri} ends with a
+     * trailing slash.
+     *
+     * @param uri the URI string to normalise; must not be {@code null}
+     * @return the URI string with a trailing slash; never {@code null}
+     */
+    private static @NonNull String ensureTrailingSlash(final @NonNull String uri) {
         return uri.endsWith("/") ? uri : uri + "/";
     }
 }
