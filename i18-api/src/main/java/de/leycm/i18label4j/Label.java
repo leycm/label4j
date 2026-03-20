@@ -31,7 +31,7 @@ public interface Label {
 
     default @NonNull Label mapTo(final @NonNull String key,
                                  final @NonNull Supplier<Object> supplier) throws IllegalArgumentException {
-        return mapTo(new Mapping(key, () -> String.valueOf(supplier.get())));
+        return mapTo(new Mapping(key, supplier));
     }
 
     @NonNull Label mapTo(final @NonNull Mapping mapping) throws IllegalArgumentException;
