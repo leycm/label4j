@@ -14,13 +14,35 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Defines the placeholder syntax used to substitute {@link Mapping}
+ * values into a source string.
+ *
+ * <p>A {@link MappingRule} is constructed from a prefix and an optional
+ * suffix that delimit placeholder tokens. For example,
+ * {@link #DOLLAR_CURLY} matches {@code ${key}}, while
+ * {@link #PERCENT} matches {@code %key%}. At construction time the rule
+ * compiles an optimized {@link Pattern} and pre-computes escape-sequence
+ * metadata so that {@link #apply(String, Set)} can run efficiently at
+ * runtime.</p>
+ *
+ * <p>The {@link #apply(String, Set)} method replaces all occurrences of
+ * recognised placeholder tokens with their corresponding values from the
+ * supplied {@link Set} of {@link Mapping} instances. Unrecognised tokens
+ * are left unchanged. Escape sequences (backslash before the prefix)
+ * are protected and restored after substitution.</p>
+ *
+ * <p>Thread Safety: Instances are effectively immutable after construction
+ * and may be shared freely across threads.</p>
+ *
+ * @since 1.0
+ * @see Mapping
+ * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
+ */
 @Getter
 public class MappingRule {
 
@@ -57,20 +79,34 @@ public class MappingRule {
     /** Minecraft Legacy style: {@code §:variable} */
     public static final @NonNull MappingRule MINECRAFT_LEGACY = new MappingRule("§:", "");
 
+    // Characters with special meaning in Java regex
     private static final String REGEX_META = "\\.^§$*+?()[]{}|";
+    // Regex capturing group for valid placeholder key characters
     private static final String KEY_REGEX = "([A-Za-z0-9_\\-]+)";
+    // Internal sentinel used to protect escaped prefix sequences during apply()
     private static final String ESCAPED_PREFIX = "\u0001P";
+    // Internal sentinel used to protect escaped suffix sequences during apply()
     private static final String ESCAPED_SUFFIX = "\u0001S";
-    private static final int INPUT_LIMIT = 1_000_000; // 1mb should be enough for everyone
+    // Maximum allowed input length (1 MB) passed to apply()
+    private static final int INPUT_LIMIT = 1_000_000;
+    // Maximum number of substitutions performed in a single apply() call
     private static final int MAX_MATCHES = 10_000;
 
-    private final String prefix;
-    private final String suffix;
-    private final Pattern pattern;
+    private final @NonNull String prefix;
+    private final @NonNull String suffix;
+    private final @NonNull Pattern pattern;
 
+    // null when prefix/suffix is empty (no escape processing needed)
     private final @Nullable String escapedPrefixLiteral;
     private final @Nullable String escapedSuffixLiteral;
 
+    /**
+     * Escapes all regex metacharacters in {@code s} so the string can
+     * be used as a literal inside a compiled {@link Pattern}.
+     *
+     * @param s the string to escape; must not be {@code null}
+     * @return the escaped string; never {@code null}
+     */
     private static @NonNull String regexEscape(final @NonNull String s) {
         StringBuilder sb = new StringBuilder(s.length() * 2);
         for (int i = 0; i < s.length(); i++) {
@@ -81,10 +117,27 @@ public class MappingRule {
         return sb.toString();
     }
 
+    /**
+     * Constructs a new {@link MappingRule} with the given delimiter pair.
+     *
+     * <p>The prefix and suffix are escaped for use in a {@link Pattern}.
+     * If the suffix is empty the rule matches open-ended tokens
+     * (e.g. {@link #SHELL}: {@code $key}). Escape literals are computed
+     * to enable backslash-escaping of the prefix during
+     * {@link #apply(String, Set)}.</p>
+     *
+     * @param prefix the opening delimiter; must not be {@code null},
+     *               may be empty only when suffix is also empty
+     * @param suffix the closing delimiter; must not be {@code null},
+     *               may be empty
+     * @throws NullPointerException if {@code prefix} or {@code suffix}
+     *                              is {@code null}
+     * @throws IllegalArgumentException if both {@code prefix} and
+     *                                  {@code suffix} are empty
+     */
     public MappingRule(final @NonNull String prefix, final @NonNull String suffix) {
         this.prefix = prefix;
         this.suffix = suffix;
-
 
         this.escapedPrefixLiteral = prefix.isEmpty() ? null : "\\" + prefix;
         this.escapedSuffixLiteral = suffix.isEmpty() ? null : "\\" + suffix;
@@ -96,7 +149,36 @@ public class MappingRule {
         }
     }
 
-    public @NonNull String apply(final @NonNull String input, final @NonNull Set<Mapping> mappings) {
+    /**
+     * Replaces all placeholder tokens in {@code input} with the values
+     * from the supplied {@link Set} of {@link Mapping} instances.
+     *
+     * <p>The method first checks whether the prefix is present at all;
+     * if not, {@code input} is returned as-is without any allocation.
+     * When at least one match is possible, a lookup map is built from
+     * the mappings and the compiled {@link #pattern} is applied.</p>
+     *
+     * <p>Escape sequences — a backslash immediately before the prefix —
+     * are protected before substitution and restored afterwards, allowing
+     * callers to include literal prefix characters in the output.</p>
+     *
+     * <p>The method enforces two safety limits: inputs longer than
+     * {@code 1 000 000} characters are rejected, and at most
+     * {@code 10 000} substitutions are performed per call.</p>
+     *
+     * @param input    the source text to process; must not be {@code null}
+     * @param mappings the set of key-value substitutions to apply;
+     *                 must not be {@code null}
+     * @return the substituted string; never {@code null}. Returns
+     *         {@code input} unchanged when no tokens are found or
+     *         {@code mappings} is empty.
+     * @throws IllegalArgumentException if {@code input} exceeds
+     *                                  {@code 1 000 000} characters
+     * @throws NullPointerException     if {@code input} or {@code mappings}
+     *                                  is {@code null}
+     */
+    public @NonNull String apply(final @NonNull String input,
+                                 final @NonNull Set<Mapping> mappings) {
         if (input.length() > INPUT_LIMIT) throw new IllegalArgumentException("Input too large");
         if (mappings.isEmpty() || input.isEmpty()) return input;
 
@@ -140,6 +222,16 @@ public class MappingRule {
         return hasEscape ? restoreEscapes(result) : result;
     }
 
+    /**
+     * Builds a flat {@link Map} from key to string value for fast O(1)
+     * lookup during the replacement loop in {@link #apply(String, Set)}.
+     *
+     * <p>For single-entry sets an immutable singleton map is returned to
+     * avoid an unnecessary {@link HashMap} allocation.</p>
+     *
+     * @param mappings the mappings to index; must not be {@code null}
+     * @return a key-to-value map; never {@code null}
+     */
     private @NonNull Map<String, String> buildLookup(final @NonNull Set<Mapping> mappings) {
         int size = mappings.size();
         if (size == 1) {
@@ -151,23 +243,54 @@ public class MappingRule {
         return map;
     }
 
+    /**
+     * Replaces escaped prefix and suffix sequences in {@code s} with
+     * internal sentinel strings so they are not treated as token
+     * delimiters during {@link #apply(String, Set)}.
+     *
+     * @param s the string to protect; must not be {@code null}
+     * @return the string with escape sequences replaced by sentinels;
+     *         never {@code null}
+     */
     private @NonNull String protectEscapes(@NonNull String s) {
         if (escapedPrefixLiteral != null) s = s.replace(escapedPrefixLiteral, ESCAPED_PREFIX);
         if (escapedSuffixLiteral != null) s = s.replace(escapedSuffixLiteral, ESCAPED_SUFFIX);
         return s;
     }
 
+    /**
+     * Replaces internal sentinel strings back with the original prefix
+     * and suffix characters after the substitution step in
+     * {@link #apply(String, Set)}.
+     *
+     * @param s the string to restore; must not be {@code null}
+     * @return the string with sentinels replaced by the real delimiters;
+     *         never {@code null}
+     */
     private @NonNull String restoreEscapes(@NonNull String s) {
         if (escapedPrefixLiteral != null) s = s.replace(ESCAPED_PREFIX, prefix);
         if (escapedSuffixLiteral != null) s = s.replace(ESCAPED_SUFFIX, suffix);
         return s;
     }
 
+    /**
+     * Returns a human-readable representation of this rule's syntax,
+     * for example {@code MappingRule@${variable}}.
+     *
+     * @return a non-{@code null} debug string
+     */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return MappingRule.class.getSimpleName() + "@" + prefix + "variable" + suffix;
     }
 
+    /**
+     * Determines equality based on the {@code prefix} and {@code suffix} pair.
+     *
+     * @param obj the object to compare; may be {@code null}
+     * @return {@code true} if {@code obj} is a {@link MappingRule} with
+     *         the same prefix and suffix
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -176,9 +299,14 @@ public class MappingRule {
         return prefix.equals(that.prefix) && suffix.equals(that.suffix);
     }
 
+    /**
+     * Returns a hash code derived from both the {@code prefix} and
+     * {@code suffix} fields, consistent with {@link #equals(Object)}.
+     *
+     * @return the hash code
+     */
     @Override
     public int hashCode() {
         return Objects.hash(prefix, suffix);
     }
-
 }
