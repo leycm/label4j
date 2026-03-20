@@ -1,9 +1,9 @@
 dependencies {
-    compileOnly(libs.leycm.init)
-    compileOnly(libs.annos.jetbrains)
-    compileOnly(project(":api"))
+    implementation(libs.leycm.init)
+    implementation(libs.annos.jetbrains)
+    implementation(project(":api"))
 
-    compileOnly(libs.bundles.jackson)
+    implementation(libs.bundles.jackson)
 }
 
 tasks.named("sourcesJar") {
