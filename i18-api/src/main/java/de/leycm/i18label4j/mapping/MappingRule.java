@@ -12,6 +12,7 @@ package de.leycm.i18label4j.mapping;
 
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,15 +66,16 @@ public class MappingRule {
     private final String suffix;
     private final Pattern pattern;
 
-    private final String escapedPrefixLiteral;
-    private final String escapedSuffixLiteral;
+    private final @Nullable String escapedPrefixLiteral;
+    private final @Nullable String escapedSuffixLiteral;
 
     public MappingRule(final @NonNull String prefix, final @NonNull String suffix) {
         this.prefix = prefix;
         this.suffix = suffix;
 
-        this.escapedPrefixLiteral = "\\" + prefix;
-        this.escapedSuffixLiteral = "\\" + suffix;
+
+        this.escapedPrefixLiteral = prefix.isEmpty() ? null : "\\" + prefix;
+        this.escapedSuffixLiteral = suffix.isEmpty() ? null : "\\" + suffix;
 
         if (suffix.isEmpty()) {
             this.pattern = Pattern.compile(Pattern.quote(prefix) + "([A-Za-z0-9_]+)");
@@ -105,11 +107,7 @@ public class MappingRule {
         String working = input;
         boolean hasEscape = input.indexOf('\\') >= 0;
 
-        if (hasEscape) {
-            working = working
-                    .replace(escapedPrefixLiteral, ESCAPED_PREFIX)
-                    .replace(escapedSuffixLiteral, ESCAPED_SUFFIX);
-        }
+        if (hasEscape) working = protectEscapes(working);
 
         Matcher matcher = pattern.matcher(working);
 
@@ -141,14 +139,19 @@ public class MappingRule {
         sb.append(working, lastEnd, working.length());
 
         String result = sb.toString();
+        return hasEscape ? restoreEscapes(result) : result;
+    }
 
-        if (hasEscape) {
-            result = result
-                    .replace(ESCAPED_PREFIX, prefix)
-                    .replace(ESCAPED_SUFFIX, suffix);
-        }
+    private String protectEscapes(String s) {
+        if (escapedPrefixLiteral != null) s = s.replace(escapedPrefixLiteral, ESCAPED_PREFIX);
+        if (escapedSuffixLiteral != null) s = s.replace(escapedSuffixLiteral, ESCAPED_SUFFIX);
+        return s;
+    }
 
-        return result;
+    private String restoreEscapes(String s) {
+        if (escapedPrefixLiteral != null) s = s.replace(ESCAPED_PREFIX, prefix);
+        if (escapedSuffixLiteral != null) s = s.replace(ESCAPED_SUFFIX, suffix);
+        return s;
     }
 
     @Override
