@@ -19,6 +19,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -43,7 +44,7 @@ import java.util.function.Function;
  * are considered equal regardless of their fallback functions.</p>
  *
  * <p>Thread Safety: This class is not thread-safe. The mutable
- * {@code mappings} set is not synchronised; instances must not be
+ * {@code mappings} set is not synchronized; instances must not be
  * modified and accessed from multiple threads concurrently.</p>
  *
  * @since 1.0
@@ -74,7 +75,7 @@ public class LocaleLabel implements Label {
     public LocaleLabel(final @NonNull LabelProvider provider,
                        final @NonNull String key,
                        final @NonNull Function<Locale, String> fallback) {
-        this(provider, new HashSet<>(), key, fallback);
+        this(provider, ConcurrentHashMap.newKeySet(), key, fallback);
     }
 
     /**
@@ -94,8 +95,12 @@ public class LocaleLabel implements Label {
                        final @NonNull Set<Mapping> mappings,
                        final @NonNull String key,
                        final @NonNull Function<Locale, String> fallback) {
+        // note: using a concurrent set to be thread-safe
+        final Set<Mapping> set = ConcurrentHashMap.newKeySet();
+        set.addAll(mappings);
+
         this.provider = provider;
-        this.mappings = mappings;
+        this.mappings = set;
         this.key = key;
         this.fallback = fallback;
     }

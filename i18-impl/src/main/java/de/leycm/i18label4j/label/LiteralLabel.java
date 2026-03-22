@@ -19,6 +19,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@link Label} implementation that holds a fixed literal string.
@@ -60,7 +61,7 @@ public class LiteralLabel implements Label {
      */
     public LiteralLabel(final @NonNull LabelProvider provider,
                         final @NonNull String literal) {
-        this(provider, new HashSet<>(), literal);
+        this(provider, ConcurrentHashMap.newKeySet(), literal);
     }
 
     /**
@@ -77,8 +78,11 @@ public class LiteralLabel implements Label {
     public LiteralLabel(final @NonNull LabelProvider provider,
                         final @NonNull Set<Mapping> mappings,
                         final @NonNull String literal) {
+        final Set<Mapping> set = ConcurrentHashMap.newKeySet();
+        set.addAll(mappings);
+
         this.provider = provider;
-        this.mappings = mappings;
+        this.mappings = set;
         this.literal = literal;
     }
 
