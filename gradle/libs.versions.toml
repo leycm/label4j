@@ -28,7 +28,8 @@ adventure-plain = { group = "net.kyori", name = "adventure-text-serializer-plain
 adventure-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version = "4.24.0" }
 adventure-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version = "4.24.0" }
 
-leycm-init = { group = "de.leycm", name = "init4j-api", version = "1.1" }
+leycm-init = { group = "de.leycm", name = "init4j-api", version = "1.2" }
+leycm-label = { group = "de.leycm", name = "i18label4j-api", version = "1.0" }
 
 [bundles]
 adventure = ["adventure-api", "adventure-minimessage", "adventure-plain", "adventure-legacy", "adventure-gson"]

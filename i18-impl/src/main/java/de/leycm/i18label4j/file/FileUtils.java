@@ -47,11 +47,15 @@ import java.util.stream.Stream;
  */
 public final class FileUtils {
 
+    // ==== Constants =========================================================
+
     // Filename of the remote directory listing file
     private static final String LS_FILE = ".dir";
 
     /** Utility class — not instantiable. */
     private FileUtils() {}
+
+    // ==== Public API =========================================================
 
     /**
      * Returns the set of child {@link URI}s contained in the directory
@@ -135,6 +139,8 @@ public final class FileUtils {
         };
     }
 
+    // ==== Resource Scheme Implementation ====================================
+
     /**
      * Lists child entries inside a classpath resource directory.
      *
@@ -188,6 +194,8 @@ public final class FileUtils {
         }
     }
 
+    // ==== Remote Scheme Implementation ======================================
+
     /**
      * Lists child entries inside a remote directory using the {@code .dir}
      * listing convention.
@@ -212,6 +220,8 @@ public final class FileUtils {
         }
         return children;
     }
+
+    // ==== File Scheme Implementation ========================================
 
     /**
      * Lists child entries inside a local file-system directory.
@@ -241,6 +251,8 @@ public final class FileUtils {
             throw new RuntimeException("Failed to list directory: " + uri, e);
         }
     }
+
+    // ==== File Reading Implementations ======================================
 
     /**
      * Reads a classpath resource file and returns its content as a string.
@@ -298,6 +310,8 @@ public final class FileUtils {
             throw new RuntimeException("Failed to read file: " + uri, e);
         }
     }
+
+    // ==== Type Detection Implementations ===================================
 
     /**
      * Returns {@code true} if the given {@code resource://} URI points
@@ -407,6 +421,8 @@ public final class FileUtils {
 
         return false;
     }
+
+    // ==== Utility Methods ===================================================
 
     /**
      * Extracts the classpath-relative path from a {@code resource://} URI.

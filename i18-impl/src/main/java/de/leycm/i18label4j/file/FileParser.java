@@ -64,6 +64,8 @@ public interface FileParser {
      */
     @NonNull Map<String, String> parse(@NonNull URI uri) throws Exception;
 
+    // ==== Helper Methods ====================================================
+
     /**
      * Converts a raw {@code Map<String, Object>} into a
      * {@code Map<String, String>} by calling {@link String#valueOf(Object)}
@@ -84,6 +86,8 @@ public interface FileParser {
         }
         return result;
     }
+
+    // ==== Implementations ==================================================
 
     /**
      * {@link FileParser} implementation for JSON files.
@@ -146,7 +150,7 @@ public interface FileParser {
      */
     final class YamlParser implements FileParser {
 
-        /** Shared SnakeYAML instance. Not thread-safe — synchronize if needed. */
+        // shared SnakeYAML instance
         private static final Yaml YAML = new Yaml();
 
         /**
@@ -192,7 +196,7 @@ public interface FileParser {
      */
     final class TomlParser implements FileParser {
 
-        /** Shared toml4j instance. */
+        // shared toml4j instance.
         private static final Toml TOML = new Toml();
 
         /**

@@ -54,9 +54,13 @@ import java.util.function.Function;
 @SuppressWarnings("ClassCanBeRecord") // cause: mutable mappings
 public class LocaleLabel implements Label {
 
+    // the owning label provider
     private final @NonNull LabelProvider provider;
+    // the set of placeholder mappings
     private final @NonNull Set<Mapping> mappings;
+    // the translation key for lookups
     private final @NonNull String key;
+    // the fallback function for missing translations
     private final @NonNull Function<Locale, String> fallback;
 
     /**
@@ -96,6 +100,8 @@ public class LocaleLabel implements Label {
         this.fallback = fallback;
     }
 
+    // ==== Basic Accessors ===================================================
+
     /**
      * Returns the owning {@link LabelProvider}.
      *
@@ -125,6 +131,8 @@ public class LocaleLabel implements Label {
         return key;
     }
 
+    // ==== Mapping Registration ===============================================
+
     /**
      * {@inheritDoc}
      *
@@ -141,6 +149,8 @@ public class LocaleLabel implements Label {
         mappings.add(mapping);
         return this;
     }
+
+    // ==== Resolution ========================================================
 
     /**
      * Looks up the translation for the given locale via the
@@ -161,6 +171,8 @@ public class LocaleLabel implements Label {
     public @NonNull String in(final @NonNull Locale locale) {
         return provider.translate(locale, key, fallback.apply(locale));
     }
+
+    // ==== Object Methods ===================================================
 
     /**
      * Returns a string representation of this label.

@@ -56,8 +56,14 @@ import java.util.*;
 @RequiredArgsConstructor
 public final class DirSource implements LocalizationSource {
 
+    // ==== Instance State ===================================================
+
+    // the root directory containing locale subdirectories
     private final @NonNull URI directory;
+    // the parser for reading translation files
     private final @NonNull FileParser parser;
+
+    // ==== Public API =========================================================
 
     /**
      * Discovers all locale subdirectories under the configured root
@@ -134,6 +140,8 @@ public final class DirSource implements LocalizationSource {
         return result;
     }
 
+    // ==== Factory Methods ==================================================
+
     /**
      * Creates a {@link DirSource} that parses JSON files.
      *
@@ -177,6 +185,8 @@ public final class DirSource implements LocalizationSource {
     public static @NonNull DirSource properties(final @NonNull URI directory) {
         return new DirSource(directory, new FileParser.Property());
     }
+
+    // ==== Helper Methods ====================================================
 
     /**
      * Extracts the last path segment from a URI, stripping any trailing
