@@ -67,6 +67,8 @@ public interface LabelProvider extends Instanceable {
         return Instanceable.getInstance(LabelProvider.class);
     }
 
+    // ==== Configuration ====================================================
+
     /**
      * Returns the {@link LocalizationSource} used to load raw
      * translation data.
@@ -91,28 +93,7 @@ public interface LabelProvider extends Instanceable {
      */
     @NonNull MappingRule getDefaultMappingRule();
 
-    /**
-     * Pre-loads and caches translations for the given locales.
-     *
-     * <p>This method forces the provider to load all translation data
-     * for each supplied {@link Locale} into the internal cache. Warm-up
-     * eliminates first-request latency in latency-sensitive code paths.</p>
-     *
-     * <p>Note: The sentinel key {@code "__warmup__"} is used internally
-     * to trigger cache population. A translation file containing a key
-     * with that name will still be cached correctly and is not excluded.</p>
-     *
-     * @param localizations the locales to warm up; must not be {@code null},
-     *                      individual elements must not be {@code null}
-     * @throws IllegalArgumentException if a locale's translation data
-     *                                  cannot be loaded from the source
-     */
-    default void warmUp(final @NonNull Locale @NonNull ... localizations) {
-        for (Locale locale : localizations) {
-            // note: using the key "__warmup__" to cache the actual translations there still can be a translation called "__warmup__".
-            translate(locale, "__warmup__", "__warmup__");
-        }
-    }
+    // ==== Label Creation ===================================================
 
     /**
      * Creates a new locale-aware {@link Label} backed by a translation key.
@@ -139,6 +120,8 @@ public interface LabelProvider extends Instanceable {
      */
     @NonNull Label createLiteralLabel(@NonNull String literal);
 
+    // ==== Translation ======================================================
+
     /**
      * Translates a key into the given locale, returning a fallback
      * string when no translation is available.
@@ -164,6 +147,8 @@ public interface LabelProvider extends Instanceable {
     @NonNull String translate(@NonNull Locale locale,
                               @NonNull String key,
                               @NonNull String fallback) throws NullPointerException;
+
+    // ==== Serialization ====================================================
 
     /**
      * Serializes a {@link Label} into the requested type {@code T}.
@@ -229,6 +214,8 @@ public interface LabelProvider extends Instanceable {
     <T> @NonNull T format(@NonNull String input,
                           @NonNull Class<T> type)
             throws FormatException;
+
+    // ==== Cache Management =================================================
 
     /**
      * Clears all cached translations for all locales.

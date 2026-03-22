@@ -49,8 +49,14 @@ import java.util.*;
 @RequiredArgsConstructor
 public final class FileSource implements LocalizationSource {
 
+    // ==== Instance State ===================================================
+
+    // the directory containing translation files
     private final @NonNull URI directory;
+    // the parser for reading translation files
     private final @NonNull FileParser parser;
+
+    // ==== Public API =========================================================
 
     /**
      * Scans the configured directory for files matching the parser's
@@ -111,6 +117,8 @@ public final class FileSource implements LocalizationSource {
         return parser.parse(file);
     }
 
+    // ==== Factory Methods ==================================================
+
     /**
      * Creates a {@link FileSource} that parses JSON files.
      *
@@ -154,6 +162,8 @@ public final class FileSource implements LocalizationSource {
     public static @NonNull FileSource properties(final @NonNull URI directory) {
         return new FileSource(directory, new FileParser.Property());
     }
+
+    // ==== Helper Methods ====================================================
 
     /**
      * Extracts the last path segment from a URI, stripping any trailing

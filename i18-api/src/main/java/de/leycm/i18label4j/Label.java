@@ -48,6 +48,8 @@ import java.util.function.Supplier;
  */
 public interface Label {
 
+    // ==== Basic Accessors ===================================================
+
     /**
      * Returns the {@link LabelProvider} that owns this label.
      *
@@ -62,6 +64,8 @@ public interface Label {
      * @return the set of mappings; never {@code null}, may be empty
      */
     @NonNull Set<Mapping> getMappings();
+
+    // ==== Mapping Registration ===============================================
 
     /**
      * Registers a static placeholder mapping on this label.
@@ -113,6 +117,8 @@ public interface Label {
      *                                  already exists on this label
      */
     @NonNull Label mapTo(final @NonNull Mapping mapping) throws IllegalArgumentException;
+
+    // ==== Raw Resolution ====================================================
 
     /**
      * Resolves this label using the provider's default {@link Locale},
@@ -235,6 +241,8 @@ public interface Label {
         return getProvider().getDefaultMappingRule().apply(in(locale), getMappings());
     }
 
+    // ==== Serialization ====================================================
+
     /**
      * Serializes this label into the requested type {@code T} using the
      * registered {@link LabelSerializer}.
@@ -249,6 +257,8 @@ public interface Label {
     default <T> @NonNull T serialize(Class<T> type) {
         return getProvider().serialize(this, type);
     }
+
+    // ==== Object Methods ===================================================
 
     /**
      * Returns a string representation of this label.

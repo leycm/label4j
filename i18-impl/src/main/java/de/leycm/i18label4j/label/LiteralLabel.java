@@ -19,6 +19,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@link Label} implementation that holds a fixed literal string.
@@ -45,8 +46,11 @@ import java.util.*;
 @SuppressWarnings("ClassCanBeRecord") // cause: mutable mappings
 public class LiteralLabel implements Label {
 
+    // the owning label provider
     private final @NonNull LabelProvider provider;
+    // the set of placeholder mappings
     private final @NonNull Set<Mapping> mappings;
+    // the fixed literal text value
     private final @NonNull String literal;
 
     /**
@@ -57,7 +61,7 @@ public class LiteralLabel implements Label {
      */
     public LiteralLabel(final @NonNull LabelProvider provider,
                         final @NonNull String literal) {
-        this(provider, new HashSet<>(), literal);
+        this(provider, ConcurrentHashMap.newKeySet(), literal);
     }
 
     /**
@@ -74,10 +78,16 @@ public class LiteralLabel implements Label {
     public LiteralLabel(final @NonNull LabelProvider provider,
                         final @NonNull Set<Mapping> mappings,
                         final @NonNull String literal) {
+        // note: using a concurrent set to be thread-safe
+        final Set<Mapping> set = ConcurrentHashMap.newKeySet();
+        set.addAll(mappings);
+
         this.provider = provider;
-        this.mappings = mappings;
+        this.mappings = set;
         this.literal = literal;
     }
+
+    // ==== Basic Accessors ===================================================
 
     /**
      * Returns the owning {@link LabelProvider}.
@@ -108,6 +118,8 @@ public class LiteralLabel implements Label {
         return literal;
     }
 
+    // ==== Mapping Registration ===============================================
+
     /**
      * {@inheritDoc}
      *
@@ -125,6 +137,8 @@ public class LiteralLabel implements Label {
         return this;
     }
 
+    // ==== Resolution ========================================================
+
     /**
      * Returns the literal string, ignoring the given locale entirely.
      *
@@ -135,6 +149,8 @@ public class LiteralLabel implements Label {
     public @NonNull String in(final @NonNull Locale locale) {
         return literal;
     }
+
+    // ==== Object Methods ===================================================
 
     /**
      * Returns a string representation of this label.

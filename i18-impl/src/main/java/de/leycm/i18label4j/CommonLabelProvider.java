@@ -58,6 +58,8 @@ import java.util.stream.Collectors;
  */
 public class CommonLabelProvider implements LabelProvider {
 
+    // ==== Builder ===========================================================
+
     /**
      * Fluent builder for {@link CommonLabelProvider} instances.
      *
@@ -172,6 +174,8 @@ public class CommonLabelProvider implements LabelProvider {
         }
     }
 
+    // ==== Factory ==========================================================
+
     /**
      * Creates and returns a new {@link Builder} instance.
      *
@@ -181,6 +185,8 @@ public class CommonLabelProvider implements LabelProvider {
     public static @NonNull Builder builder() {
         return new Builder();
     }
+
+    // ==== Instance State ===================================================
 
     // locale language-tag -> (translation key -> LocalizedResult)
     private final Map<String, Map<String, LocalizedResult>> translationCache = new ConcurrentHashMap<>();
@@ -218,6 +224,8 @@ public class CommonLabelProvider implements LabelProvider {
         this.defaultMappingRule = defaultMappingRule;
         this.defaultLocale = defaultLocale;
     }
+
+    // ==== Configuration ====================================================
 
     /**
      * Returns the {@link LocalizationSource} used by this provider.
@@ -274,6 +282,8 @@ public class CommonLabelProvider implements LabelProvider {
     public @NonNull Label createLiteralLabel(final @NonNull String literal) {
         return new LiteralLabel(this, literal);
     }
+
+    // ==== Translation ======================================================
 
     /**
      * {@inheritDoc}
@@ -380,6 +390,8 @@ public class CommonLabelProvider implements LabelProvider {
         return localMap;
     }
 
+    // ==== Serialization ====================================================
+
     /**
      * {@inheritDoc}
      *
@@ -476,6 +488,8 @@ public class CommonLabelProvider implements LabelProvider {
             throw new IncompatibleMatchException(type, e);
         }
     }
+
+    // ==== Cache Management =================================================
 
     /**
      * {@inheritDoc}

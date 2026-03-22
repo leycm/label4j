@@ -46,6 +46,8 @@ import java.util.regex.Pattern;
 @Getter
 public class MappingRule {
 
+    // ==== Built-in Rules ====================================================
+
     /** Double Curly style: {@code {{variable}}} (Vue, Handlebars, Jinja) */
     public static final @NonNull MappingRule DOUBLE_CURLY = new MappingRule("{{", "}}");
 
@@ -79,6 +81,8 @@ public class MappingRule {
     /** Minecraft Legacy style: {@code §:variable} */
     public static final @NonNull MappingRule MINECRAFT_LEGACY = new MappingRule("§:", "");
 
+    // ==== Internal Constants ================================================
+
     // Characters with special meaning in Java regex
     private static final String REGEX_META = "\\.^§$*+?()[]{}|";
     // Regex capturing group for valid placeholder key characters
@@ -100,6 +104,8 @@ public class MappingRule {
     private final @Nullable String escapedPrefixLiteral;
     private final @Nullable String escapedSuffixLiteral;
 
+    // ==== Helper Methods ====================================================
+
     /**
      * Escapes all regex metacharacters in {@code s} so the string can
      * be used as a literal inside a compiled {@link Pattern}.
@@ -116,6 +122,8 @@ public class MappingRule {
         }
         return sb.toString();
     }
+
+    // ==== Public API =======================================================
 
     /**
      * Constructs a new {@link MappingRule} with the given delimiter pair.
@@ -222,6 +230,8 @@ public class MappingRule {
         return hasEscape ? restoreEscapes(result) : result;
     }
 
+    // ==== Internal Implementation ===========================================
+
     /**
      * Builds a flat {@link Map} from key to string value for fast O(1)
      * lookup during the replacement loop in {@link #apply(String, Set)}.
@@ -272,6 +282,8 @@ public class MappingRule {
         if (escapedSuffixLiteral != null) s = s.replace(ESCAPED_SUFFIX, suffix);
         return s;
     }
+
+    // ==== Object Methods ===================================================
 
     /**
      * Returns a human-readable representation of this rule's syntax,
