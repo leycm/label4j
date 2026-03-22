@@ -78,6 +78,7 @@ public class LiteralLabel implements Label {
     public LiteralLabel(final @NonNull LabelProvider provider,
                         final @NonNull Set<Mapping> mappings,
                         final @NonNull String literal) {
+        // note: using a concurrent set to be thread-safe
         final Set<Mapping> set = ConcurrentHashMap.newKeySet();
         set.addAll(mappings);
 
