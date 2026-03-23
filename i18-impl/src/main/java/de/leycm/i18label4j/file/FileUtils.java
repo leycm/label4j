@@ -18,6 +18,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -52,10 +53,69 @@ public final class FileUtils {
     // Filename of the remote directory listing file
     private static final String LS_FILE = ".dir";
 
-    /** Utility class — not instantiable. */
-    private FileUtils() {}
+    /** Utility class */
+    private FileUtils() {
+        throw new UnsupportedOperationException(getClass().getName() + " is a static only class and cannot be instantiated");
+    }
 
-    // ==== Public API =========================================================
+    // ==== Public Helper API =================================================
+
+    /** Converts a {@link Locale} to a file tag string suitable for naming
+     * localization files, using underscores as separators and lower-case
+     * letters (e.g. {@code en}, {@code en_us}, {@code de}). This is the
+     * inverse of {@link #fromFileTag(String)}.
+     *
+     * @param locale the locale to convert; must not be {@code null}
+     * @return the file tag string; never {@code null}
+     */
+    public static String toFileTag(final @NonNull Locale locale) {
+        return locale.toLanguageTag().replace("-", "_").toLowerCase();
+    }
+
+    /** Converts a file tag string (e.g. {@code en}, {@code en_us}, {@code de})
+     * back to a {@link Locale}. Underscores are treated as separators and
+     * converted to hyphens before parsing the tag. This is the inverse of
+     * {@link #toFileTag(Locale)}.
+     *
+     * @param tag the file tag string; must not be {@code null}
+     * @return the corresponding {@link Locale}; never {@code null}
+     */
+    public static Locale fromFileTag(final @NonNull String tag) {
+        return Locale.forLanguageTag(tag.replace("_", "-"));
+    }
+
+    /**
+     * Extracts the last path segment from a URI, stripping any trailing
+     * slash first.
+     *
+     * @param uri the URI to extract the last segment from;
+     *            must not be {@code null}
+     * @return the last segment; never {@code null}
+     */
+    public static @NonNull String lastName(final @NonNull URI uri) {
+        String path = uri.toString();
+        // note: strip trailing slash if present
+        if (path.endsWith("/")) path = path.substring(0, path.length() - 1);
+        int idx = path.lastIndexOf('/');
+        return idx >= 0 ? path.substring(idx + 1) : path;
+    }
+
+    /**
+     * Resolves a child name relative to a base URI, ensuring a
+     * trailing slash before appending.
+     *
+     * @param base the base directory URI; must not be {@code null}
+     * @param name the child name to append; must not be {@code null}
+     * @return the resolved child URI; never {@code null}
+     */
+    public static @NonNull URI resolve(final @NonNull URI base,
+                                       final @NonNull String name) {
+        String s = base.toString();
+        if (!s.endsWith("/")) s += "/";
+        return URI.create(s + name);
+    }
+
+    // ==== File Resolve API ==================================================
 
     /**
      * Returns the set of child {@link URI}s contained in the directory
@@ -487,7 +547,7 @@ public final class FileUtils {
      * Ensures the string representation of {@code uri} ends with a
      * trailing slash.
      *
-     * @param uri the URI string to normalise; must not be {@code null}
+     * @param uri the URI string to normalize; must not be {@code null}
      * @return the URI string with a trailing slash; never {@code null}
      */
     private static @NonNull String ensureTrailingSlash(final @NonNull String uri) {

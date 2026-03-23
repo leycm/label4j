@@ -79,7 +79,7 @@ public final class FileSource implements LocalizationSource {
 
         for (URI entry : FileUtils.readDir(directory)) {
             if (!FileUtils.isFile(entry)) continue;
-            String name = lastName(entry);
+            String name = FileUtils.lastName(entry);
             if (!name.endsWith(ext)) continue;
             String tag = name.substring(0, name.length() - ext.length());
             try {
@@ -108,8 +108,7 @@ public final class FileSource implements LocalizationSource {
     @Override
     public @NonNull Map<String, String> getLocalization(final @NonNull Locale locale)
             throws Exception {
-        String tag = locale.toLanguageTag().replace("-", "_").toLowerCase();
-        URI file = resolve(directory, tag + "." + parser.extension());
+        URI file = FileUtils.resolve(directory, FileUtils.toFileTag(locale) + "." + parser.extension());
 
         if (!FileUtils.isFile(file)) {
             throw new NoSuchElementException("No file for locale: " + locale + " (expected: " + file + ")");
@@ -163,36 +162,4 @@ public final class FileSource implements LocalizationSource {
         return new FileSource(directory, new FileParser.Property());
     }
 
-    // ==== Helper Methods ====================================================
-
-    /**
-     * Extracts the last path segment from a URI, stripping any trailing
-     * slash first.
-     *
-     * @param uri the URI to extract the last segment from;
-     *            must not be {@code null}
-     * @return the last segment; never {@code null}
-     */
-    private static @NonNull String lastName(final @NonNull URI uri) {
-        String path = uri.toString();
-        // note: strip trailing slash if present
-        if (path.endsWith("/")) path = path.substring(0, path.length() - 1);
-        int idx = path.lastIndexOf('/');
-        return idx >= 0 ? path.substring(idx + 1) : path;
-    }
-
-    /**
-     * Resolves a child name relative to a base URI, ensuring a
-     * trailing slash before appending.
-     *
-     * @param base the base directory URI; must not be {@code null}
-     * @param name the child name to append; must not be {@code null}
-     * @return the resolved child URI; never {@code null}
-     */
-    private static @NonNull URI resolve(final @NonNull URI base,
-                                        final @NonNull String name) {
-        String s = base.toString();
-        if (!s.endsWith("/")) s += "/";
-        return URI.create(s + name);
-    }
 }
