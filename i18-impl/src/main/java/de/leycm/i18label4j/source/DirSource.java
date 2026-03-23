@@ -22,7 +22,7 @@ import java.util.*;
 
 /**
  * A {@link LocalizationSource} that reads localization files from a
- * directory tree where each locale occupies its own sub-directory.
+ * directory tree where each locale occupies its own subdirectory.
  *
  * <p>The expected layout is:</p>
  * <pre>
