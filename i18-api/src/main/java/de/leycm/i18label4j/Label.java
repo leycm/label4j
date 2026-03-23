@@ -20,6 +20,7 @@ import lombok.NonNull;
 
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -47,6 +48,130 @@ import java.util.function.Supplier;
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
 public interface Label {
+
+    // ==== Factory Methods ===================================================
+
+    /**
+     * Creates a translatable label for the given key using the default {@link LabelProvider}.
+     *
+     * <p>When no translation is found for the current locale, the provider's default
+     * fallback strategy is applied (see {@link LabelProvider#createI18Label(String, Function)}).</p>
+     *
+     * @param key the translation key; must not be {@code null}
+     * @return a translatable label; never {@code null}
+     * @throws NullPointerException if {@code key} is {@code null}
+     */
+    static @NonNull Label of(final @NonNull String key) {
+        return of(LabelProvider.getInstance(), key);
+    }
+
+
+    /**
+     * Creates a translatable label for the given key using the default {@link LabelProvider},
+     * with a static string used as the fallback when no translation is available.
+     *
+     * @param key      the translation key; must not be {@code null}
+     * @param fallback the text returned when no translation is found; must not be {@code null}
+     * @return a translatable label; never {@code null}
+     * @throws NullPointerException if {@code key} or {@code fallback} is {@code null}
+     */
+    static @NonNull Label of(final @NonNull String key,
+                             final @NonNull String fallback) {
+        return of(LabelProvider.getInstance(), key, fallback);
+    }
+
+    /**
+     * Creates a translatable label for the given key using the default {@link LabelProvider},
+     * with a locale-aware function used as the fallback when no translation is available.
+     *
+     * @param key      the translation key; must not be {@code null}
+     * @param fallback a function that receives the requested {@link Locale} and returns
+     *                 the fallback text; must not be {@code null}
+     * @return a translatable label; never {@code null}
+     * @throws NullPointerException if {@code key} or {@code fallback} is {@code null}
+     */
+    static @NonNull Label of(final @NonNull String key,
+                             final @NonNull Function<Locale, String> fallback) {
+        return of(LabelProvider.getInstance(), key, fallback);
+    }
+
+    /**
+     * Creates a translatable label for the given key using the specified {@link LabelProvider}.
+     *
+     * <p>The provider's default fallback strategy is applied when no translation is found.</p>
+     *
+     * @param provider the provider responsible for translation lookup; must not be {@code null}
+     * @param key      the translation key; must not be {@code null}
+     * @return a translatable label; never {@code null}
+     * @throws NullPointerException if {@code provider} or {@code key} is {@code null}
+     */
+    static @NonNull Label of(final @NonNull LabelProvider provider,
+                             final @NonNull String key) {
+        return provider.createI18Label(key, locale -> locale.toLanguageTag() + "." + key);
+    }
+
+    /**
+     * Creates a translatable label for the given key using the specified {@link LabelProvider},
+     * with a static string used as the fallback when no translation is available.
+     *
+     * @param provider the provider responsible for translation lookup; must not be {@code null}
+     * @param key      the translation key; must not be {@code null}
+     * @param fallback the text returned when no translation is found; must not be {@code null}
+     * @return a translatable label; never {@code null}
+     * @throws NullPointerException if {@code provider}, {@code key}, or {@code fallback} is {@code null}
+     */
+    static @NonNull Label of(final @NonNull LabelProvider provider,
+                             final @NonNull String key,
+                             final @NonNull String fallback) {
+        return provider.createI18Label(key, locale -> fallback);
+    }
+
+    /**
+     * Creates a translatable label for the given key using the specified {@link LabelProvider},
+     * with a locale-aware function used as the fallback when no translation is available.
+     *
+     * @param provider the provider responsible for translation lookup; must not be {@code null}
+     * @param key      the translation key; must not be {@code null}
+     * @param fallback a function that receives the requested {@link Locale} and returns
+     *                 the fallback text; must not be {@code null}
+     * @return a translatable label; never {@code null}
+     * @throws NullPointerException if {@code provider}, {@code key}, or {@code fallback} is {@code null}
+     */
+    static @NonNull Label of(final @NonNull LabelProvider provider,
+                             final @NonNull String key,
+                             final @NonNull Function<Locale, String> fallback) {
+        return provider.createI18Label(key, fallback);
+    }
+
+    /**
+     * Creates a literal (non-translatable) label with the given static text,
+     * using the default {@link LabelProvider}.
+     *
+     * <p>Literal labels are returned as-is and are never looked up in a resource bundle.
+     * They are useful for dynamic or already-localized strings that should still
+     * participate in the {@link Label} abstraction (e.g. for consistent component handling).</p>
+     *
+     * @param literal the static text content; must not be {@code null}
+     * @return a literal label; never {@code null}
+     * @throws NullPointerException if {@code literal} is {@code null}
+     */
+    static @NonNull Label literal(final @NonNull String literal) {
+        return literal(LabelProvider.getInstance(), literal);
+    }
+
+    /**
+     * Creates a literal (non-translatable) label with the given static text,
+     * using the specified {@link LabelProvider}.
+     *
+     * @param provider the provider to associate with this label; must not be {@code null}
+     * @param literal  the static text content; must not be {@code null}
+     * @return a literal label; never {@code null}
+     * @throws NullPointerException if {@code provider} or {@code literal} is {@code null}
+     */
+    static @NonNull Label literal(final @NonNull LabelProvider provider,
+                                  final @NonNull String literal) {
+        return provider.createLiteralLabel(literal);
+    }
 
     // ==== Basic Accessors ===================================================
 
