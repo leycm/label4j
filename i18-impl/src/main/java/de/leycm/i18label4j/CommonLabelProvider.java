@@ -157,7 +157,7 @@ public class CommonLabelProvider implements LabelProvider {
          * by {@link LabelProvider#warmUp(Locale...)}.</p>
          *
          * @param source  the localization source to use; must not be {@code null}
-         * @param locales the locales to pre-load; must not be {@code null},
+         * @param locales the locales to preload; must not be {@code null},
          *                individual elements must not be {@code null}
          * @return a new, pre-warmed {@link CommonLabelProvider}; never {@code null}
          * @throws IllegalArgumentException if any locale's translation data
@@ -334,7 +334,7 @@ public class CommonLabelProvider implements LabelProvider {
 
         return localeMap.computeIfAbsent(key, k -> {
             if (getDefaultLocale().equals(locale))
-                return new LocalizedResult(null);
+                return new LocalizedResult(locale, null);
             return translate(getDefaultLocale(), key);
         });
     }
@@ -371,7 +371,7 @@ public class CommonLabelProvider implements LabelProvider {
                         .entrySet()
                         .stream()
                         .collect(Collectors.toConcurrentMap(Map.Entry::getKey,
-                                e -> new LocalizedResult(e.getValue())));
+                                e -> new LocalizedResult(locale, e.getValue())));
 
             } catch (Exception e) {
                 loadException.set(new IllegalArgumentException(

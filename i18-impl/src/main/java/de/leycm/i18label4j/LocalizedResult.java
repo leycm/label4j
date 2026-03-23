@@ -13,6 +13,8 @@ package de.leycm.i18label4j;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Locale;
+
 /**
  * Immutable record wrapping the outcome of a single translation lookup.
  *
@@ -26,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * Being a record with only immutable fields, this class is inherently
  * thread-safe.</p>
  *
+ * @param origin    the locale for which this translation result was
  * @param localized the translated string, or {@code null} when no
  *                  translation was found
  *
@@ -33,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
  * @see CommonLabelProvider
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-public record LocalizedResult(@Nullable String localized) {
+public record LocalizedResult(@NonNull Locale origin, @Nullable String localized) {
 
     /**
      * Returns the translated string if present, otherwise returns

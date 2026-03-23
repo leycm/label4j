@@ -67,6 +67,31 @@ public interface LabelProvider extends Instanceable {
         return Instanceable.getInstance(LabelProvider.class);
     }
 
+    // ==== Warm Up ===========================================================
+
+    /**
+     * Pre-loads and caches translations for the given locales.
+     *
+     * <p>This method forces the provider to load all translation data
+     * for each supplied {@link Locale} into the internal cache. Warm-up
+     * eliminates first-request latency in latency-sensitive code paths.</p>
+     *
+     * <p>Note: The sentinel key {@code "__warmup__"} is used internally
+     * to trigger cache population. A translation file containing a key
+     * with that name will still be cached correctly and is not excluded.</p>
+     *
+     * @param localizations the locales to warm up; must not be {@code null},
+     *                      individual elements must not be {@code null}
+     * @throws IllegalArgumentException if a locale's translation data
+     *                                  cannot be loaded from the source
+     */
+    default void warmUp(final @NonNull Locale @NonNull ... localizations) {
+        for (Locale locale : localizations) {
+            // note: using the key "__warmup__" to cache the actual translations there still can be a translation called "__warmup__".
+            translate(locale, "__warmup__", "__warmup__");
+        }
+    }
+
     // ==== Configuration ====================================================
 
     /**
