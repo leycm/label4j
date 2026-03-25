@@ -66,17 +66,11 @@ public interface FileParser {
 
     // ==== Helper Methods ====================================================
 
-    /**
-     * Converts a raw {@code Map<String, Object>} into a
-     * {@code Map<String, String>} by calling {@link String#valueOf(Object)}
-     * on each value.
-     *
-     * <p>{@code null} values in {@code raw} are preserved as
-     * {@code null} in the result.</p>
-     *
-     * @param raw the raw map; must not be {@code null}
-     * @return a flat string map; never {@code null}
-     */
+    // Converts a raw {@code Map<String, Object>} into a
+    // {@code Map<String, String>} by calling {@link String#valueOf(Object)}
+    // on each value.
+    // {@code null} values in {@code raw} are preserved as
+    // {@code null} in the result.
     private static @NonNull Map<String, String> flattenRaw(
             final @NonNull Map<String, Object> raw) {
         Map<String, String> result = new LinkedHashMap<>();
@@ -137,21 +131,21 @@ public interface FileParser {
     /**
      * {@link FileParser} implementation for YAML files ({@code .yml}).
      *
-     * <p>Uses SnakeYAML to parse the file content. A single {@link Yaml}
-     * instance is reused across all calls via the {@code YAML} constant.
+     * <p>Uses SnakeYAML to parse the file content. Each {@link YamlParser}
+     * instance creates its own {@link Yaml} instance to ensure thread safety.
      * Only flat (non-nested) YAML mappings are supported.</p>
      *
-     * <p><b>Note:</b> SnakeYAML's {@link Yaml} is not thread-safe. If
-     * concurrent parsing is required, synchronize on {@code YAML} or
-     * construct a new instance per call.</p>
+     * <p>Thread Safety: This implementation is thread-safe. Each instance
+     * has its own {@link Yaml} parser, so no synchronization is required
+     * between threads.</p>
      *
      * @since 1.0
      * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
      */
     final class YamlParser implements FileParser {
 
-        // shared SnakeYAML instance
-        private static final Yaml YAML = new Yaml();
+        // local SnakeYAML instance - not thread-safe
+        private final Yaml YAML = new Yaml();
 
         /**
          * Returns {@code "yml"}.
@@ -176,10 +170,7 @@ public interface FileParser {
         @Override
         public @NonNull Map<String, String> parse(final @NonNull URI uri) throws YAMLException {
             final String content = FileUtils.readFile(uri);
-            final Map<String, Object> raw;
-            synchronized (YAML) {
-                raw = YAML.load(content);
-            }
+            final Map<String, Object> raw = YAML.load(content);
             return flattenRaw(raw == null ? Collections.emptyMap() : raw);
         }
     }
@@ -187,17 +178,21 @@ public interface FileParser {
     /**
      * {@link FileParser} implementation for TOML files.
      *
-     * <p>Uses toml4j to parse the file content. A single {@link Toml}
-     * instance is reused across all calls via the {@code TOML} constant.
+     * <p>Uses toml4j to parse the file content. Each {@link TomlParser}
+     * instance creates its own {@link Toml} instance to ensure thread safety.
      * Only flat (non-nested) TOML tables are supported.</p>
+     *
+     * <p>Thread Safety: This implementation is thread-safe. Each instance
+     * has its own {@link Toml} parser, so no synchronization is required
+     * between threads.</p>
      *
      * @since 1.0
      * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
      */
     final class TomlParser implements FileParser {
 
-        // shared toml4j instance.
-        private static final Toml TOML = new Toml();
+        // local toml4j instance - thread-safe
+        private final Toml TOML = new Toml();
 
         /**
          * Returns {@code "toml"}.

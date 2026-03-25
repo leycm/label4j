@@ -50,7 +50,6 @@ import java.util.function.Supplier;
 public interface Label {
 
     // ==== Factory Methods ===================================================
-
     /**
      * Creates a translatable label for the given key using the default {@link LabelProvider}.
      *
@@ -64,7 +63,6 @@ public interface Label {
     static @NonNull Label of(final @NonNull String key) {
         return of(LabelProvider.getInstance(), key);
     }
-
 
     /**
      * Creates a translatable label for the given key using the default {@link LabelProvider},
@@ -204,6 +202,8 @@ public interface Label {
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
+     * @throws NullPointerException     if {@code key} or {@code value}
+     *                                  is {@code null}
      */
     default @NonNull Label mapTo(final @NonNull String key,
                                  final @NonNull Object value) throws IllegalArgumentException {
@@ -223,6 +223,8 @@ public interface Label {
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
+     * @throws NullPointerException     if {@code key} or {@code supplier}
+     *                                  is {@code null}
      */
     default @NonNull Label mapTo(final @NonNull String key,
                                  final @NonNull Supplier<Object> supplier) throws IllegalArgumentException {
@@ -240,6 +242,7 @@ public interface Label {
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
+     * @throws NullPointerException     if {@code mapping} is {@code null}
      */
     @NonNull Label mapTo(final @NonNull Mapping mapping) throws IllegalArgumentException;
 

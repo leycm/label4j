@@ -127,6 +127,7 @@ public class LiteralLabel implements Label {
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
+     * @throws NullPointerException     if {@code mapping} is {@code null}
      */
     @Override
     public @NonNull Label mapTo(final @NonNull Mapping mapping) throws IllegalArgumentException {

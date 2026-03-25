@@ -106,13 +106,8 @@ public class MappingRule {
 
     // ==== Helper Methods ====================================================
 
-    /**
-     * Escapes all regex metacharacters in {@code s} so the string can
-     * be used as a literal inside a compiled {@link Pattern}.
-     *
-     * @param s the string to escape; must not be {@code null}
-     * @return the escaped string; never {@code null}
-     */
+    // Escapes all regex metacharacters in {@code s} so the string can
+    // be used as a literal inside a compiled {@link Pattern}.
     private static @NonNull String regexEscape(final @NonNull String s) {
         StringBuilder sb = new StringBuilder(s.length() * 2);
         for (int i = 0; i < s.length(); i++) {
@@ -232,16 +227,10 @@ public class MappingRule {
 
     // ==== Internal Implementation ===========================================
 
-    /**
-     * Builds a flat {@link Map} from key to string value for fast O(1)
-     * lookup during the replacement loop in {@link #apply(String, Set)}.
-     *
-     * <p>For single-entry sets an immutable singleton map is returned to
-     * avoid an unnecessary {@link HashMap} allocation.</p>
-     *
-     * @param mappings the mappings to index; must not be {@code null}
-     * @return a key-to-value map; never {@code null}
-     */
+    // Builds a flat {@link Map} from key to string value for fast O(1)
+    // lookup during the replacement loop in {@link #apply(String, Set)}.
+    // For single-entry sets an immutable singleton map is returned to
+    // avoid an unnecessary {@link HashMap} allocation.
     private @NonNull Map<String, String> buildLookup(final @NonNull Set<Mapping> mappings) {
         int size = mappings.size();
         if (size == 1) {
@@ -253,30 +242,18 @@ public class MappingRule {
         return map;
     }
 
-    /**
-     * Replaces escaped prefix and suffix sequences in {@code s} with
-     * internal sentinel strings so they are not treated as token
-     * delimiters during {@link #apply(String, Set)}.
-     *
-     * @param s the string to protect; must not be {@code null}
-     * @return the string with escape sequences replaced by sentinels;
-     *         never {@code null}
-     */
+    // Replaces escaped prefix and suffix sequences in {@code s} with
+    // internal sentinel strings so they are not treated as token
+    // delimiters during {@link #apply(String, Set)}.
     private @NonNull String protectEscapes(@NonNull String s) {
         if (escapedPrefixLiteral != null) s = s.replace(escapedPrefixLiteral, ESCAPED_PREFIX);
         if (escapedSuffixLiteral != null) s = s.replace(escapedSuffixLiteral, ESCAPED_SUFFIX);
         return s;
     }
 
-    /**
-     * Replaces internal sentinel strings back with the original prefix
-     * and suffix characters after the substitution step in
-     * {@link #apply(String, Set)}.
-     *
-     * @param s the string to restore; must not be {@code null}
-     * @return the string with sentinels replaced by the real delimiters;
-     *         never {@code null}
-     */
+    // Replaces internal sentinel strings back with the original prefix
+    // and suffix characters after the substitution step in
+    // {@link #apply(String, Set)}.
     private @NonNull String restoreEscapes(@NonNull String s) {
         if (escapedPrefixLiteral != null) s = s.replace(ESCAPED_PREFIX, prefix);
         if (escapedSuffixLiteral != null) s = s.replace(ESCAPED_SUFFIX, suffix);
