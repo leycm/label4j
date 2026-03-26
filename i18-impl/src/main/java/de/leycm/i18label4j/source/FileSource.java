@@ -12,9 +12,7 @@ package de.leycm.i18label4j.source;
 
 import de.leycm.i18label4j.file.FileParser;
 import de.leycm.i18label4j.file.FileUtils;
-
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Contract;
 
 import java.net.URI;
@@ -41,12 +39,11 @@ import java.util.*;
  * <p>Thread Safety: Instances are effectively immutable after construction
  * and may be shared across threads safely.</p>
  *
- * @since 1.0
+ * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  * @see LocalizationSource
  * @see DirSource
- * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
+ * @since 1.0
  */
-@RequiredArgsConstructor
 public final class FileSource implements LocalizationSource {
 
     // ==== Instance State ===================================================
@@ -55,6 +52,19 @@ public final class FileSource implements LocalizationSource {
     private final @NonNull URI directory;
     // the parser for reading translation files
     private final @NonNull FileParser parser;
+
+    /**
+     * Creates a new {@link FileSource} with the given directory and parser.
+     *
+     * @param directory the root directory URI; must not be {@code null}
+     * @param parser    the file parser to use; must not be {@code null}
+     * @throws NullPointerException if either argument is {@code null}
+     */
+    public FileSource(final @NonNull URI directory,
+                      final @NonNull FileParser parser) {
+        this.directory = directory;
+        this.parser = parser;
+    }
 
     // ==== Public API =========================================================
 
@@ -84,7 +94,8 @@ public final class FileSource implements LocalizationSource {
             String tag = name.substring(0, name.length() - ext.length());
             try {
                 locales.add(Locale.forLanguageTag(tag.replace("_", "-")));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         return locales;
     }
@@ -100,7 +111,7 @@ public final class FileSource implements LocalizationSource {
      *
      * @param locale the locale to load; must not be {@code null}
      * @return a flat map of key-to-value pairs; never {@code null},
-     *         may be empty
+     * may be empty
      * @throws NoSuchElementException if no file exists for the requested
      *                                locale
      * @throws Exception              if the file cannot be read or parsed

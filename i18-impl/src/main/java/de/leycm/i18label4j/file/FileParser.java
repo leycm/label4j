@@ -95,6 +95,12 @@ public interface FileParser {
     final class Json implements FileParser {
 
         /**
+         * No instance state is needed for this parser, so the constructor is
+         * empty.
+         */
+        public Json() { }
+
+        /**
          * Returns {@code "json"}.
          *
          * @return the extension; never {@code null}
@@ -148,6 +154,12 @@ public interface FileParser {
         private final Yaml YAML = new Yaml();
 
         /**
+         * No instance state is needed for this parser, so the constructor is
+         * empty.
+         */
+        public YamlParser() { }
+
+        /**
          * Returns {@code "yml"}.
          *
          * @return the extension; never {@code null}
@@ -195,6 +207,12 @@ public interface FileParser {
         private final Toml TOML = new Toml();
 
         /**
+         * No instance state is needed for this parser, so the constructor is
+         * empty.
+         */
+        public TomlParser() { }
+
+        /**
          * Returns {@code "toml"}.
          *
          * @return the extension; never {@code null}
@@ -231,6 +249,12 @@ public interface FileParser {
      * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
      */
     final class Property implements FileParser {
+
+        /**
+         * No instance state is needed for this parser, so the constructor is
+         * empty.
+         */
+        public Property() { }
 
         /**
          * Returns {@code "properties"}.

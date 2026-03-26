@@ -43,7 +43,6 @@ import java.util.regex.Pattern;
  * @see Mapping
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-@Getter
 public class MappingRule {
 
     // ==== Built-in Rules ====================================================

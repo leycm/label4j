@@ -47,6 +47,17 @@ public record Mapping(@NonNull String key,
 ) {
 
     /**
+     * Constructs a new {@link Mapping} with the specified key and value
+     * supplier.
+     *
+     * @param key   the placeholder key; must not be {@code null}
+     * @param value the value supplier; must not be {@code null}
+     * @throws NullPointerException if either {@code key} or {@code value} is
+     *                              {@code null}
+     */
+    public Mapping { }
+
+    /**
      * Evaluates the value supplier and converts the result to a
      * {@link String} using {@link String#valueOf(Object)}.
      *

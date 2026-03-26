@@ -39,6 +39,18 @@ import java.util.Locale;
 public record LocalizedResult(@NonNull Locale origin, @Nullable String localized) {
 
     /**
+     * Constructs a new {@link LocalizedResult} with the specified origin
+     * locale and localized string.
+     *
+     * @param origin    the locale for which this translation result was
+     *                  obtained; must not be {@code null}
+     * @param localized the translated string, or {@code null} when no
+     *                  translation was found
+     * @throws NullPointerException if {@code origin} is {@code null}
+     */
+    public LocalizedResult { }
+
+    /**
      * Returns the translated string if present, otherwise returns
      * {@code defaultValue}.
      *
