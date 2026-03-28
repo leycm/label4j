@@ -39,7 +39,7 @@ import lombok.NonNull;
  * @see LabelSerializer
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-public interface MCStructsTextSerializer extends LabelSerializer<TextComponent> {
+public interface MCStructsTextSerializer extends LiteralFormatSerializer<TextComponent> {
 
     // ==== MCStructs Interface ===============================================
 
@@ -74,7 +74,7 @@ public interface MCStructsTextSerializer extends LabelSerializer<TextComponent> 
      *
      * <p>{@link TranslationComponent} instances are converted to a locale-aware
      * {@link Label} using the component's translation key. All other component types
-     * are converted to a {@link LiteralLabel} via {@link #toLiteral(TextComponent)}.</p>
+     * are converted to a {@link LiteralLabel} via {@link #toLiteral(Object)}.</p>
      *
      * @param serialized the component to deserialize; never {@code null}
      * @param provider   the label provider used to construct the result; never {@code null}
@@ -94,44 +94,12 @@ public interface MCStructsTextSerializer extends LabelSerializer<TextComponent> 
         }
     }
 
-    /**
-     * Parses a raw string input into an MCStructs {@link TextComponent}.
-     *
-     * @param input the string to parse; never {@code null}
-     * @return the resulting {@link TextComponent}; never {@code null}
-     * @throws FormatException when the input cannot be parsed
-     */
-    @Override
-    default @NonNull TextComponent format(@NonNull String input) throws FormatException {
-        try {
-            return fromLiteral(input);
-        } catch (Exception e) {
-            throw new FormatException(input, e);
-        }
-    }
-
-    /**
-     * Converts an MCStructs {@link TextComponent} to its string literal representation.
-     *
-     * @param component the component to convert; never {@code null}
-     * @return the string literal; never {@code null}
-     */
-    @NonNull String toLiteral(@NonNull TextComponent component);
-
-    /**
-     * Converts a string literal to an MCStructs {@link TextComponent}.
-     *
-     * @param literal the string to parse; never {@code null}
-     * @return the resulting {@link TextComponent}; never {@code null}
-     */
-    @NonNull TextComponent fromLiteral(@NonNull String literal);
-
     // ==== CodecSerializer ===================================================
 
     /**
      * Base implementation of {@link MCStructsTextSerializer} backed by a MCStructs {@link TextComponentCodec}.
      *
-     * <p>Delegates {@link #toLiteral(TextComponent)} and {@link #fromLiteral(String)} to the
+     * <p>Delegates {@link #toLiteral(Object)} and {@link #fromLiteral(String)} to the
      * wrapped {@link TextComponentCodec}, enabling format-agnostic reuse across all
      * MCStructs codec types.</p>
      *
