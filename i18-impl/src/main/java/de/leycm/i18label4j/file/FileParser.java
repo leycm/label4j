@@ -11,11 +11,13 @@
 package de.leycm.i18label4j.file;
 
 import com.google.gson.JsonParseException;
+
 import com.moandjiezana.toml.Toml;
-import lombok.NonNull;
 import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
+
+import lombok.NonNull;
 
 import java.io.StringReader;
 import java.net.URI;

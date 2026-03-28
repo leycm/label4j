@@ -12,6 +12,7 @@ package de.leycm.i18label4j.source;
 
 import de.leycm.i18label4j.file.FileParser;
 import de.leycm.i18label4j.file.FileUtils;
+
 import lombok.NonNull;
 import org.jetbrains.annotations.Contract;
 

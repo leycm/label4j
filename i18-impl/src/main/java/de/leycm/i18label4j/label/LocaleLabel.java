@@ -14,8 +14,8 @@ import de.leycm.i18label4j.Label;
 import de.leycm.i18label4j.LabelProvider;
 import de.leycm.i18label4j.mapping.Mapping;
 import de.leycm.i18label4j.mapping.MappingRule;
-
 import de.leycm.i18label4j.Localization;
+
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;

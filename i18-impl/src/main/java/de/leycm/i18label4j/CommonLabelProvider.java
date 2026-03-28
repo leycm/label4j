@@ -110,7 +110,7 @@ public class CommonLabelProvider implements LabelProvider {
 
         /**
          * Sets the default {@link MappingRule} used when
-         * {@link Label#mapped()} is called without an explicit rule.
+         * {@link Label#resolve()} is called without an explicit rule.
          *
          * <p>Defaults to {@link MappingRule#DOLLAR_CURLY} if not set.</p>
          *

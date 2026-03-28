@@ -9,12 +9,12 @@ import de.leycm.i18label4j.label.LocaleLabel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-
-import lombok.NonNull;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
+import lombok.NonNull;
 
 public interface AdventureComponentSerializer extends LabelSerializer<Component> {
 
