@@ -57,7 +57,7 @@ public interface FileParser {
      * Reads the file at the given URI and returns a flat
      * {@code Map<String, String>} of all key-value pairs.
      *
-     * @param uri the location of the file to parse; must not be {@code null}
+     * @param uri the location of the file to parse; never {@code null}
      * @return a map of translation entries; never {@code null}, may be empty
      * @throws Exception if the file cannot be read or the content is
      *                   malformed for this parser's format
@@ -114,7 +114,7 @@ public interface FileParser {
         /**
          * Reads and parses a JSON file.
          *
-         * @param uri the location of the JSON file; must not be {@code null}
+         * @param uri the location of the JSON file; never {@code null}
          * @return a flat map of key-value pairs; never {@code null}
          * @throws JsonParseException if the JSON is malformed
          * @throws IllegalArgumentException if the URI scheme is unsupported
@@ -173,7 +173,7 @@ public interface FileParser {
         /**
          * Reads and parses a YAML file.
          *
-         * @param uri the location of the YAML file; must not be {@code null}
+         * @param uri the location of the YAML file; never {@code null}
          * @return a flat map of key-value pairs; never {@code null}
          * @throws YAMLException if the YAML is malformed
          * @throws IllegalArgumentException if the URI scheme is unsupported
@@ -226,7 +226,7 @@ public interface FileParser {
         /**
          * Reads and parses a TOML file.
          *
-         * @param uri the location of the TOML file; must not be {@code null}
+         * @param uri the location of the TOML file; never {@code null}
          * @return a flat map of key-value pairs; never {@code null}
          * @throws IllegalArgumentException if the URI scheme is unsupported or the content is not a valid TOML table
          * @throws RuntimeException if reading the file fails
@@ -270,7 +270,7 @@ public interface FileParser {
         /**
          * Reads and parses a {@code .properties} file.
          *
-         * @param uri the location of the properties file; must not be {@code null}
+         * @param uri the location of the properties file; never {@code null}
          * @return a map of key-value pairs; never {@code null}
          * @throws Exception if the file cannot be read or is malformed
          * @throws NullPointerException if {@code uri} is {@code null}

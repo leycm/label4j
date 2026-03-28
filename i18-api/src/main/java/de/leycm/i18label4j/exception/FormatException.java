@@ -40,7 +40,7 @@ public class FormatException extends RuntimeException {
     /**
      * Constructs a new exception with the given detail message.
      *
-     * @param message the detail message; must not be {@code null}
+     * @param message the detail message; never {@code null}
      */
     public FormatException(final @NonNull String message) {
         super(message);
@@ -54,8 +54,8 @@ public class FormatException extends RuntimeException {
      * {@code "Value '<source>' could not be formatted:"}.</p>
      *
      * @param source the string that could not be formatted;
-     *               must not be {@code null}
-     * @param cause  the underlying exception; must not be {@code null}
+     *               never {@code null}
+     * @param cause  the underlying exception; never {@code null}
      */
     public FormatException(final @NonNull String source,
                            final @NonNull Throwable cause) {
@@ -70,10 +70,10 @@ public class FormatException extends RuntimeException {
      * {@code "Value '<source>' could not be formatted into <class>:"}.</p>
      *
      * @param source the string that could not be formatted;
-     *               must not be {@code null}
+     *               never {@code null}
      * @param clazz  the target class that was attempted;
-     *               must not be {@code null}
-     * @param cause  the underlying exception; must not be {@code null}
+     *               never {@code null}
+     * @param cause  the underlying exception; never {@code null}
      */
     public FormatException(final @NonNull String source,
                            final @NonNull Class<?> clazz,

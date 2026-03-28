@@ -57,8 +57,8 @@ public final class FileSource implements LocalizationSource {
     /**
      * Creates a new {@link FileSource} with the given directory and parser.
      *
-     * @param directory the root directory URI; must not be {@code null}
-     * @param parser    the file parser to use; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
+     * @param parser    the file parser to use; never {@code null}
      * @throws NullPointerException if either argument is {@code null}
      */
     public FileSource(final @NonNull URI directory,
@@ -110,7 +110,7 @@ public final class FileSource implements LocalizationSource {
      * (e.g. {@code en_US.json}). The file is then parsed by the
      * configured {@link FileParser} and its keys are returned unchanged.</p>
      *
-     * @param locale the locale to load; must not be {@code null}
+     * @param locale the locale to load; never {@code null}
      * @return a flat map of key-to-value pairs; never {@code null},
      * may be empty
      * @throws NoSuchElementException if no file exists for the requested
@@ -133,7 +133,7 @@ public final class FileSource implements LocalizationSource {
     /**
      * Creates a {@link FileSource} that parses JSON files.
      *
-     * @param directory the root directory URI; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
      * @return a new {@link FileSource}; never {@code null}
      */
     @Contract("_ -> new")
@@ -144,7 +144,7 @@ public final class FileSource implements LocalizationSource {
     /**
      * Creates a {@link FileSource} that parses YAML files.
      *
-     * @param directory the root directory URI; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
      * @return a new {@link FileSource}; never {@code null}
      */
     @Contract("_ -> new")
@@ -155,7 +155,7 @@ public final class FileSource implements LocalizationSource {
     /**
      * Creates a {@link FileSource} that parses TOML files.
      *
-     * @param directory the root directory URI; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
      * @return a new {@link FileSource}; never {@code null}
      */
     @Contract("_ -> new")
@@ -166,7 +166,7 @@ public final class FileSource implements LocalizationSource {
     /**
      * Creates a {@link FileSource} that parses {@code .properties} files.
      *
-     * @param directory the root directory URI; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
      * @return a new {@link FileSource}; never {@code null}
      */
     @Contract("_ -> new")

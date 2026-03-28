@@ -50,8 +50,8 @@ public record Mapping(@NonNull String key,
      * Constructs a new {@link Mapping} with the specified key and value
      * supplier.
      *
-     * @param key   the placeholder key; must not be {@code null}
-     * @param value the value supplier; must not be {@code null}
+     * @param key   the placeholder key; never {@code null}
+     * @param value the value supplier; never {@code null}
      * @throws NullPointerException if either {@code key} or {@code value} is
      *                              {@code null}
      */
@@ -112,7 +112,7 @@ public record Mapping(@NonNull String key,
      * that a {@link Set} of mappings cannot contain duplicate
      * keys.</p>
      *
-     * @param obj the object to compare; may be {@code null}
+     * @param obj the object to compare; can be {@code null}
      * @return {@code true} if {@code obj} is a {@link Mapping} with an
      *         equal key
      */

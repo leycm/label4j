@@ -57,7 +57,7 @@ public interface Label {
      * <p>When no translation is found for the current locale, the provider's default
      * fallback strategy is applied (see {@link LabelProvider#createI18Label(String, String)}).</p>
      *
-     * @param key the translation key; must not be {@code null}
+     * @param key the translation key; never {@code null}
      * @return a translatable label; never {@code null}
      * @throws NullPointerException if {@code key} is {@code null}
      */
@@ -69,10 +69,10 @@ public interface Label {
      * Creates a translatable label for the given key using the default {@link LabelProvider},
      * with a static string used as the fallback when no translation is available.
      *
-     * @param key      the translation key; must not be {@code null}
-     * @param fallback the text returned when no translation is found; must not be {@code null}
+     * @param key      the translation key; never {@code null}
+     * @param fallback the text returned when no translation is found; can be {@code null}
      * @return a translatable label; never {@code null}
-     * @throws NullPointerException if {@code key} or {@code fallback} is {@code null}
+     * @throws NullPointerException if {@code key} is {@code null}
      */
     static @NonNull Label of(final @NonNull String key,
                              final @NonNull String fallback) {
@@ -84,8 +84,8 @@ public interface Label {
      *
      * <p>The provider's default fallback strategy is applied when no translation is found.</p>
      *
-     * @param provider the provider responsible for translation lookup; must not be {@code null}
-     * @param key      the translation key; must not be {@code null}
+     * @param provider the provider responsible for translation lookup; never {@code null}
+     * @param key      the translation key; never {@code null}
      * @return a translatable label; never {@code null}
      * @throws NullPointerException if {@code provider} or {@code key} is {@code null}
      */
@@ -98,11 +98,11 @@ public interface Label {
      * Creates a translatable label for the given key using the specified {@link LabelProvider},
      * with a static string used as the fallback when no translation is available.
      *
-     * @param provider the provider responsible for translation lookup; must not be {@code null}
-     * @param key      the translation key; must not be {@code null}
-     * @param fallback the text returned when no translation is found; must not be {@code null}
+     * @param provider the provider responsible for translation lookup; never {@code null}
+     * @param key      the translation key; never {@code null}
+     * @param fallback the text returned when no translation is found; can be {@code null}
      * @return a translatable label; never {@code null}
-     * @throws NullPointerException if {@code provider}, {@code key}, or {@code fallback} is {@code null}
+     * @throws NullPointerException if {@code provider} or {@code key} is {@code null}
      */
     static @NonNull Label of(final @NonNull LabelProvider provider,
                              final @NonNull String key,
@@ -118,7 +118,7 @@ public interface Label {
      * They are useful for dynamic or already-localized strings that should still
      * participate in the {@link Label} abstraction (e.g. for consistent component handling).</p>
      *
-     * @param literal the static text content; must not be {@code null}
+     * @param literal the static text content; never {@code null}
      * @return a literal label; never {@code null}
      * @throws NullPointerException if {@code literal} is {@code null}
      */
@@ -130,8 +130,8 @@ public interface Label {
      * Creates a literal (non-translatable) label with the given static text,
      * using the specified {@link LabelProvider}.
      *
-     * @param provider the provider to associate with this label; must not be {@code null}
-     * @param literal  the static text content; must not be {@code null}
+     * @param provider the provider to associate with this label; never {@code null}
+     * @param literal  the static text content; never {@code null}
      * @return a literal label; never {@code null}
      * @throws NullPointerException if {@code provider} or {@code literal} is {@code null}
      */
@@ -166,8 +166,8 @@ public interface Label {
      * {@code value} in a constant {@link Supplier}. The key must not
      * already be registered on this label.</p>
      *
-     * @param key   the placeholder key; must not be {@code null}
-     * @param value the static replacement value; must not be {@code null}
+     * @param key   the placeholder key; never {@code null}
+     * @param value the static replacement value; never {@code null}
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
@@ -186,9 +186,9 @@ public interface Label {
      * {@link Mapping} from the provided key and supplier. The supplier
      * is evaluated lazily each time {@link #resolve()} is called.</p>
      *
-     * @param key      the placeholder key; must not be {@code null}
+     * @param key      the placeholder key; never {@code null}
      * @param supplier the value supplier evaluated at mapping time;
-     *                 must not be {@code null}
+     *                 never {@code null}
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
@@ -207,7 +207,7 @@ public interface Label {
      * Duplicate keys are rejected to prevent ambiguous substitution
      * results.</p>
      *
-     * @param mapping the mapping to register; must not be {@code null}
+     * @param mapping the mapping to register; never {@code null}
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
@@ -236,7 +236,7 @@ public interface Label {
      * into type {@code T}.
      *
      * @param <T>  the target type
-     * @param type the class of the target type; must not be {@code null}
+     * @param type the class of the target type; never {@code null}
      * @return the formatted, substituted value; never {@code null}
      * @throws FormatException if no
      *         serializer is registered for {@code type}, or if conversion fails
@@ -252,8 +252,8 @@ public interface Label {
      * the given {@link Locale}, then formats the result into type {@code T}.
      *
      * @param <T>    the target type
-     * @param locale the locale to resolve for; must not be {@code null}
-     * @param type   the class of the target type; must not be {@code null}
+     * @param locale the locale to resolve for; never {@code null}
+     * @param type   the class of the target type; never {@code null}
      * @return the formatted, substituted value; never {@code null}
      * @throws FormatException if no
      *         serializer is registered for {@code type}, or if conversion fails
@@ -268,7 +268,7 @@ public interface Label {
      * Resolves and applies all registered {@link Mapping} objects for
      * the given {@link Locale} using the provider's default mapping rule.
      *
-     * @param locale the locale to resolve for; must not be {@code null}
+     * @param locale the locale to resolve for; never {@code null}
      * @return the substituted string; never {@code null}
      * @throws IllegalArgumentException if the resolved text exceeds
      *         the mapping engine's input size limit
@@ -298,7 +298,7 @@ public interface Label {
      * the {@link LabelProvider}. For literal labels this simply returns
      * the fixed {@link Localization} regardless of the locale.</p>
      *
-     * @param locale the locale to resolve for; must not be {@code null}
+     * @param locale the locale to resolve for; never {@code null}
      * @return the raw resolved entry; never {@code null}
      */
     @NonNull Localization localizationOf(@NonNull Locale locale);
@@ -323,7 +323,7 @@ public interface Label {
      * the {@link LabelProvider}. For literal labels this simply returns
      * the fixed literal string regardless of the locale.</p>
      *
-     * @param locale the locale to resolve for; must not be {@code null}
+     * @param locale the locale to resolve for; never {@code null}
      * @return the raw resolved string; never {@code null}
      */
     @NonNull String rawOf(@NonNull Locale locale);
@@ -337,7 +337,7 @@ public interface Label {
      * registered {@link LabelSerializer}.
      *
      * @param <T>  the target type
-     * @param type the class of the target type; must not be {@code null}
+     * @param type the class of the target type; never {@code null}
      * @return the serialized representation; never {@code null}
      * @throws SerializationException if serialization fails
      * @throws IllegalArgumentException if no serializer is registered
@@ -369,7 +369,7 @@ public interface Label {
      * content" means, for example, same provider and same key for
      * locale labels, or same provider and same literal for literal labels.</p>
      *
-     * @param obj the object to compare; may be {@code null}
+     * @param obj the object to compare; can be {@code null}
      * @return {@code true} if the objects are logically equal
      */
     @Override

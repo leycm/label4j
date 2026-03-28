@@ -80,8 +80,8 @@ public interface LabelProvider extends Instanceable {
      * to trigger cache population. A translation file containing a key
      * with that name will still be cached correctly and is not excluded.</p>
      *
-     * @param localizations the locales to warm up; must not be {@code null},
-     *                      individual elements must not be {@code null}
+     * @param localizations the locales to warm up; never {@code null},
+     *                      individual elements never {@code null}
      * @throws IllegalArgumentException if a locale's translation data
      *                                  cannot be loaded from the source
      */
@@ -130,9 +130,9 @@ public interface LabelProvider extends Instanceable {
      * the requested locale or the default locale, the {@code fallback}
      * function is invoked with the requested locale to produce the result.</p>
      *
-     * @param key      the translation key; must not be {@code null}
+     * @param key      the translation key; never {@code null}
      * @param fallback the function supplying fallback text when no
-     *                 translation is found; must not be {@code null}
+     *                 translation is found; never {@code null}
      * @return a new locale-aware label; never {@code null}
      */
     @NonNull Label createI18Label(@NonNull String key, @Nullable String fallback);
@@ -141,7 +141,7 @@ public interface LabelProvider extends Instanceable {
      * Creates a new literal {@link Label} whose text never changes
      * regardless of locale.
      *
-     * @param literal the fixed text value; must not be {@code null}
+     * @param literal the fixed text value; never {@code null}
      * @return a new literal label; never {@code null}
      */
     @NonNull Label createLiteralLabel(@NonNull String literal);
@@ -161,10 +161,10 @@ public interface LabelProvider extends Instanceable {
      * the default locale, the default locale is tried as a second pass
      * before returning {@code fallback}.</p>
      *
-     * @param locale   the target locale; must not be {@code null}
-     * @param key      the translation key; must not be {@code null}
+     * @param locale   the target locale; never {@code null}
+     * @param key      the translation key; never {@code null}
      * @param fallback the value returned when no translation exists;
-     *                 must not be {@code null}
+     *                 never {@code null}
      * @return the translated string or {@code fallback}; never {@code null}
      * @throws NullPointerException     if any parameter is {@code null}
      * @throws IllegalArgumentException if the locale's translation source
@@ -180,8 +180,8 @@ public interface LabelProvider extends Instanceable {
      * Performs the internal translation lookup, returning a
      * {@link Localization} that wraps either the found translation.
      *
-     * @param locale the target locale; must not be {@code null}
-     * @param key    the translation key; must not be {@code null}
+     * @param locale the target locale; never {@code null}
+     * @param key    the translation key; never {@code null}
      * @return a {@link Localization} wrapping the translation or
      *         {@code null}; never {@code null}
      * @throws NullPointerException     if any parameter is {@code null}
@@ -204,9 +204,9 @@ public interface LabelProvider extends Instanceable {
      * method.</p>
      *
      * @param <T>   the target type
-     * @param label the label to serialize; must not be {@code null}
+     * @param label the label to serialize; never {@code null}
      * @param type  the class representing the target type;
-     *              must not be {@code null}
+     *              never {@code null}
      * @return the serialized value; never {@code null}
      * @throws SerializationException   if the serializer fails
      * @throws IllegalArgumentException if no serializer is registered
@@ -227,7 +227,7 @@ public interface LabelProvider extends Instanceable {
      * method.</p>
      *
      * @param <T>        the source type
-     * @param serialized the serialized representation; must not be {@code null}
+     * @param serialized the serialized representation; never {@code null}
      * @return the reconstructed label; never {@code null}
      * @throws DeserializationException if the serializer fails
      * @throws IllegalArgumentException if no serializer is registered
@@ -246,9 +246,9 @@ public interface LabelProvider extends Instanceable {
      * {@link Label} instance.</p>
      *
      * @param <T>   the target type
-     * @param input the raw string to format; must not be {@code null}
+     * @param input the raw string to format; never {@code null}
      * @param type  the class representing the target type;
-     *              must not be {@code null}
+     *              never {@code null}
      * @return the formatted value; never {@code null}
      * @throws FormatException          if the formatter fails
      * @throws IllegalArgumentException if no formatter is registered
@@ -276,7 +276,7 @@ public interface LabelProvider extends Instanceable {
      * for this locale will reload data from the {@link LocalizationSource}.</p>
      *
      * @param locale the locale whose cache should be evicted;
-     *               must not be {@code null}
+     *               never {@code null}
      */
     void clearCache(@NonNull Locale locale);
 
@@ -286,8 +286,8 @@ public interface LabelProvider extends Instanceable {
      * <p>Equivalent to calling {@link #clearCache(Locale)} for each
      * element of the array.</p>
      *
-     * @param locale the locales to evict; must not be {@code null},
-     *               individual elements must not be {@code null}
+     * @param locale the locales to evict; never {@code null},
+     *               individual elements never {@code null}
      */
     void clearCache(@NonNull Locale @NonNull ... locale);
 }

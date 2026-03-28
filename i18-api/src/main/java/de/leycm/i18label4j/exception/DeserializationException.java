@@ -39,7 +39,7 @@ public class DeserializationException extends RuntimeException {
     /**
      * Constructs a new exception with the given detail message.
      *
-     * @param message the detail message; must not be {@code null}
+     * @param message the detail message; never {@code null}
      */
     public DeserializationException(final @NonNull String message) {
         super(message);
@@ -53,8 +53,8 @@ public class DeserializationException extends RuntimeException {
      * {@code "Value '<source>' could not be deserialized:"}.</p>
      *
      * @param source the value that could not be deserialized;
-     *               must not be {@code null}
-     * @param cause  the underlying exception; must not be {@code null}
+     *               never {@code null}
+     * @param cause  the underlying exception; never {@code null}
      */
     public DeserializationException(final @NonNull Object source,
                                     final @NonNull Throwable cause) {
@@ -69,8 +69,8 @@ public class DeserializationException extends RuntimeException {
      * {@code "Value '<source>' could not be deserialized: <reason>"}.</p>
      *
      * @param source the value that could not be deserialized;
-     *               must not be {@code null}
-     * @param reason a human-readable explanation; must not be {@code null}
+     *               never {@code null}
+     * @param reason a human-readable explanation; never {@code null}
      */
     public DeserializationException(final @NonNull Object source,
                                     final @NonNull String reason) {

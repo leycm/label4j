@@ -63,7 +63,7 @@ public final class FileUtils {
      * letters (e.g. {@code en}, {@code en_us}, {@code de}). This is the
      * inverse of {@link #fromFileTag(String)}.
      *
-     * @param locale the locale to convert; must not be {@code null}
+     * @param locale the locale to convert; never {@code null}
      * @return the file tag string; never {@code null}
      */
     public static String toFileTag(final @NonNull Locale locale) {
@@ -75,7 +75,7 @@ public final class FileUtils {
      * converted to hyphens before parsing the tag. This is the inverse of
      * {@link #toFileTag(Locale)}.
      *
-     * @param tag the file tag string; must not be {@code null}
+     * @param tag the file tag string; never {@code null}
      * @return the corresponding {@link Locale}; never {@code null}
      */
     public static Locale fromFileTag(final @NonNull String tag) {
@@ -87,7 +87,7 @@ public final class FileUtils {
      * slash first.
      *
      * @param uri the URI to extract the last segment from;
-     *            must not be {@code null}
+     *            never {@code null}
      * @return the last segment; never {@code null}
      */
     public static @NonNull String lastName(final @NonNull URI uri) {
@@ -102,8 +102,8 @@ public final class FileUtils {
      * Resolves a child name relative to a base URI, ensuring a
      * trailing slash before appending.
      *
-     * @param base the base directory URI; must not be {@code null}
-     * @param name the child name to append; must not be {@code null}
+     * @param base the base directory URI; never {@code null}
+     * @param name the child name to append; never {@code null}
      * @return the resolved child URI; never {@code null}
      */
     public static @NonNull URI resolve(final @NonNull URI base,
@@ -123,7 +123,7 @@ public final class FileUtils {
      * directly inside the given directory — no recursive traversal is
      * performed.</p>
      *
-     * @param uri the directory URI; must not be {@code null}
+     * @param uri the directory URI; never {@code null}
      * @return a set of child URIs; never {@code null}, may be empty
      * @throws IllegalArgumentException if the URI scheme is not
      *         {@code resource}, {@code file}, {@code http}, or
@@ -145,7 +145,7 @@ public final class FileUtils {
     /**
      * Reads and returns the full text content of the file at {@code uri}.
      *
-     * @param uri the file URI; must not be {@code null}
+     * @param uri the file URI; never {@code null}
      * @return the file contents as a string; never {@code null}
      * @throws IllegalArgumentException if the URI scheme is unsupported
      * @throws RuntimeException         if reading the file fails
@@ -164,7 +164,7 @@ public final class FileUtils {
     /**
      * Returns {@code true} if the given URI points to a directory.
      *
-     * @param uri the URI to test; must not be {@code null}
+     * @param uri the URI to test; never {@code null}
      * @return {@code true} if the URI is a directory; {@code false} otherwise
      * @throws IllegalArgumentException if the URI scheme is unsupported
      * @throws NullPointerException     if {@code uri} is {@code null}
@@ -182,7 +182,7 @@ public final class FileUtils {
     /**
      * Returns {@code true} if the given URI points to a regular file.
      *
-     * @param uri the URI to test; must not be {@code null}
+     * @param uri the URI to test; never {@code null}
      * @return {@code true} if the URI is a file; {@code false} otherwise
      * @throws IllegalArgumentException if the URI scheme is unsupported
      * @throws NullPointerException     if {@code uri} is {@code null}
@@ -206,7 +206,7 @@ public final class FileUtils {
      * and JAR entries (running from a packaged JAR). In the JAR case the
      * entry names are scanned for direct children of the given path.</p>
      *
-     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @param uri the {@code resource://} URI; never {@code null}
      * @return a set of child URIs; never {@code null}
      * @throws IllegalArgumentException if the resource does not exist or
      *                                  is not a directory
@@ -261,7 +261,7 @@ public final class FileUtils {
      * <p>Fetches the {@code .dir} file from the remote directory URI and
      * interprets each non-empty line as the name of a child entry.</p>
      *
-     * @param uri the remote directory URI; must not be {@code null}
+     * @param uri the remote directory URI; never {@code null}
      * @return a set of child URIs; never {@code null}
      * @throws RuntimeException if the {@code .dir} listing cannot be read
      */
@@ -284,7 +284,7 @@ public final class FileUtils {
     /**
      * Lists child entries inside a local file-system directory.
      *
-     * @param uri the {@code file://} URI; must not be {@code null}
+     * @param uri the {@code file://} URI; never {@code null}
      * @return a set of child URIs; never {@code null}
      * @throws IllegalArgumentException if the path does not exist or
      *                                  is not a directory
@@ -315,7 +315,7 @@ public final class FileUtils {
     /**
      * Reads a classpath resource file and returns its content as a string.
      *
-     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @param uri the {@code resource://} URI; never {@code null}
      * @return the file content; never {@code null}
      * @throws IllegalArgumentException if the resource is not found
      * @throws RuntimeException         if reading fails
@@ -340,7 +340,7 @@ public final class FileUtils {
      * Fetches a remote file over HTTP/HTTPS and returns its content
      * as a string.
      *
-     * @param uri the remote file URI; must not be {@code null}
+     * @param uri the remote file URI; never {@code null}
      * @return the file content; never {@code null}
      * @throws RuntimeException if the HTTP connection or reading fails
      */
@@ -357,7 +357,7 @@ public final class FileUtils {
     /**
      * Reads a local file and returns its content as a string.
      *
-     * @param uri the {@code file://} URI; must not be {@code null}
+     * @param uri the {@code file://} URI; never {@code null}
      * @return the file content; never {@code null}
      * @throws RuntimeException if reading fails with an {@link IOException}
      */
@@ -375,7 +375,7 @@ public final class FileUtils {
      * Returns {@code true} if the given {@code resource://} URI points
      * to a directory inside the classpath.
      *
-     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @param uri the {@code resource://} URI; never {@code null}
      * @return {@code true} if the URI resolves to a directory
      */
     private static boolean isDirResource(final @NonNull URI uri) {
@@ -402,7 +402,7 @@ public final class FileUtils {
      * Returns {@code true} if the given remote URI points to a directory
      * (detected by the presence of a {@code .dir} listing file).
      *
-     * @param uri the remote URI; must not be {@code null}
+     * @param uri the remote URI; never {@code null}
      * @return {@code true} if a {@code .dir} file is accessible at the URI
      */
     private static boolean isDirRemote(final @NonNull URI uri) {
@@ -418,7 +418,7 @@ public final class FileUtils {
     /**
      * Returns {@code true} if the local path resolves to a directory.
      *
-     * @param uri the {@code file://} URI; must not be {@code null}
+     * @param uri the {@code file://} URI; never {@code null}
      * @return {@code true} if the path is a directory
      */
     private static boolean isDirFile(final @NonNull URI uri) {
@@ -428,7 +428,7 @@ public final class FileUtils {
     /**
      * Returns {@code true} if the local path resolves to a regular file.
      *
-     * @param uri the {@code file://} URI; must not be {@code null}
+     * @param uri the {@code file://} URI; never {@code null}
      * @return {@code true} if the path is a regular file
      */
     private static boolean isFileFile(final @NonNull URI uri) {
@@ -440,7 +440,7 @@ public final class FileUtils {
      * Returns {@code true} if the remote URI resolves to a readable file
      * (i.e. is reachable but is not a directory).
      *
-     * @param uri the remote URI; must not be {@code null}
+     * @param uri the remote URI; never {@code null}
      * @return {@code true} if the URI is a readable file
      */
     private static boolean isFileRemote(final @NonNull URI uri) {
@@ -457,7 +457,7 @@ public final class FileUtils {
      * Returns {@code true} if the {@code resource://} URI resolves to a
      * classpath file (not a directory).
      *
-     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @param uri the {@code resource://} URI; never {@code null}
      * @return {@code true} if the resource is a regular file
      */
     private static boolean isFileResource(final @NonNull URI uri) {
@@ -488,7 +488,7 @@ public final class FileUtils {
      * <p>Strips leading slashes so the path is suitable for
      * {@link ClassLoader#getResourceAsStream(String)}.</p>
      *
-     * @param uri the {@code resource://} URI; must not be {@code null}
+     * @param uri the {@code resource://} URI; never {@code null}
      * @return the cleaned path string; never {@code null}
      */
     private static @NonNull String resourcePath(final @NonNull URI uri) {
@@ -516,7 +516,7 @@ public final class FileUtils {
      *
      * <p>Leading slashes are stripped before constructing the URI.</p>
      *
-     * @param path the classpath path; must not be {@code null}
+     * @param path the classpath path; never {@code null}
      * @return the constructed {@code resource://} URI; never {@code null}
      */
     private static @NonNull URI createResourceUri(final @NonNull String path) {
@@ -531,7 +531,7 @@ public final class FileUtils {
      * <p>If the URI has no scheme, only its path component is used to
      * create the {@link Path}.</p>
      *
-     * @param uri the URI to convert; must not be {@code null}
+     * @param uri the URI to convert; never {@code null}
      * @return the corresponding {@link Path}; never {@code null}
      */
     private static @NonNull Path toLocalPath(final @NonNull URI uri) {
@@ -545,7 +545,7 @@ public final class FileUtils {
      * Ensures the string representation of {@code uri} ends with a
      * trailing slash.
      *
-     * @param uri the URI string to normalize; must not be {@code null}
+     * @param uri the URI string to normalize; never {@code null}
      * @return the URI string with a trailing slash; never {@code null}
      */
     private static @NonNull String ensureTrailingSlash(final @NonNull String uri) {

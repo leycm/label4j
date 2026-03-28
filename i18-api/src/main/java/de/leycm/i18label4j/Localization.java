@@ -43,7 +43,7 @@ public record Localization(@NonNull Locale origin, @Nullable String localized) {
      * locale and localized string.
      *
      * @param origin    the locale for which this translation result was
-     *                  obtained; must not be {@code null}
+     *                  obtained; never {@code null}
      * @param localized the translated string, or {@code null} when no
      *                  translation was found
      * @throws NullPointerException if {@code origin} is {@code null}
@@ -55,12 +55,24 @@ public record Localization(@NonNull Locale origin, @Nullable String localized) {
      * {@code defaultValue}.
      *
      * @param defaultValue the fallback value used when {@link #localized()}
-     *                     is {@code null}; must not be {@code null}
+     *                     is {@code null}; never {@code null}
      * @return the translated string or {@code defaultValue};
      *         never {@code null}
      */
     public @NonNull String or(final @NonNull String defaultValue) {
         return localized != null ? localized : defaultValue;
+    }
+
+    /**
+     * Returns the locale for which this translation result was obtained.
+     *
+     * <p>Note: The {@code origin} can be the requested or the default {@link Locale}</p>
+     *
+     * @return the origin locale; never {@code null}
+     */
+    @Override
+    public @NonNull Locale origin() {
+        return origin;
     }
 
     /**

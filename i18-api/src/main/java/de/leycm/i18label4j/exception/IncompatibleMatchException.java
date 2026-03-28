@@ -39,7 +39,7 @@ public class IncompatibleMatchException extends ClassCastException {
     /**
      * Constructs a new exception with the given detail message.
      *
-     * @param message the detail message; must not be {@code null}
+     * @param message the detail message; never {@code null}
      */
     public IncompatibleMatchException(final @NonNull String message) {
         super(message);
@@ -53,7 +53,7 @@ public class IncompatibleMatchException extends ClassCastException {
      * {@code "Serializer for type <type> returned incompatible type"}.</p>
      *
      * @param type the requested target type that could not be satisfied;
-     *             must not be {@code null}
+     *             never {@code null}
      */
     public IncompatibleMatchException(final @NonNull Class<?> type) {
         super("Serializer for type " + type.getName() + " returned incompatible type");
@@ -67,9 +67,9 @@ public class IncompatibleMatchException extends ClassCastException {
      * {@code "Serializer for type <type> returned incompatible type: <cause message>"}.</p>
      *
      * @param type  the requested target type that could not be satisfied;
-     *              must not be {@code null}
+     *              never {@code null}
      * @param cause the underlying {@link ClassCastException};
-     *              must not be {@code null}
+     *              never {@code null}
      */
     public IncompatibleMatchException(final @NonNull Class<?> type,
                                       final @NonNull Throwable cause) {

@@ -52,7 +52,7 @@ public interface LabelSerializer<T> {
      * {@link Label#rawOf(Locale)} or {@link Label#resolve()}) and then transform
      * it into the target representation.</p>
      *
-     * @param label the label to serialize; must not be {@code null}
+     * @param label the label to serialize; never {@code null}
      * @return the serialized value; never {@code null}
      * @throws SerializationException if the conversion fails for any
      *                                reason (e.g. unsupported format,
@@ -68,8 +68,8 @@ public interface LabelSerializer<T> {
      * value, to the extent possible given the information encoded in
      * the serialized form.</p>
      *
-     * @param serialized the serialized representation; must not be {@code null}
-     * @param provider the label provider; must not be {@code null}
+     * @param serialized the serialized representation; never {@code null}
+     * @param provider the label provider; never {@code null}
      * @return the reconstructed label; never {@code null}
      * @throws DeserializationException if the value cannot be interpreted
      *                                  as a valid label (e.g. corrupt data,
@@ -85,7 +85,7 @@ public interface LabelSerializer<T> {
      * parsing a MiniMessage string into an Adventure {@code Component}
      * without creating an intermediate label object.</p>
      *
-     * @param input the raw string to format; must not be {@code null}
+     * @param input the raw string to format; never {@code null}
      * @return the formatted value; never {@code null}
      * @throws FormatException if the string cannot be converted
      *                         into the target type

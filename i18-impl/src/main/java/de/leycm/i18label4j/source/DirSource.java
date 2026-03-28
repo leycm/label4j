@@ -69,8 +69,8 @@ public final class DirSource implements LocalizationSource {
      * <p>The {@code directory} must point to a valid directory URI, and the
      * {@code parser} must be a non-null instance of a {@link FileParser}</p>
      *
-     * @param directory the root directory URI; must not be {@code null}
-     * @param parser the parser for reading translation files; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
+     * @param parser the parser for reading translation files; never {@code null}
      * @throws NullPointerException if either {@code directory} or {@code parser} is {@code null}
      */
     public DirSource(final @NonNull URI directory,
@@ -122,7 +122,7 @@ public final class DirSource implements LocalizationSource {
      * {@code {"greeting": "Hello"}} contributes the entry
      * {@code messages.greeting = Hello}.</p>
      *
-     * @param locale the locale to load; must not be {@code null}
+     * @param locale the locale to load; never {@code null}
      * @return a flat map of fully qualified key-to-value pairs;
      * never {@code null}, may be empty
      * @throws NoSuchElementException if no subdirectory exists for
@@ -162,7 +162,7 @@ public final class DirSource implements LocalizationSource {
     /**
      * Creates a {@link DirSource} that parses JSON files.
      *
-     * @param directory the root directory URI; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
      * @return a new {@link DirSource}; never {@code null}
      */
     @Contract("_ -> new")
@@ -173,7 +173,7 @@ public final class DirSource implements LocalizationSource {
     /**
      * Creates a {@link DirSource} that parses YAML files.
      *
-     * @param directory the root directory URI; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
      * @return a new {@link DirSource}; never {@code null}
      */
     @Contract("_ -> new")
@@ -184,7 +184,7 @@ public final class DirSource implements LocalizationSource {
     /**
      * Creates a {@link DirSource} that parses TOML files.
      *
-     * @param directory the root directory URI; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
      * @return a new {@link DirSource}; never {@code null}
      */
     @Contract("_ -> new")
@@ -195,7 +195,7 @@ public final class DirSource implements LocalizationSource {
     /**
      * Creates a {@link DirSource} that parses {@code .properties} files.
      *
-     * @param directory the root directory URI; must not be {@code null}
+     * @param directory the root directory URI; never {@code null}
      * @return a new {@link DirSource}; never {@code null}
      */
     @Contract("_ -> new")

@@ -105,8 +105,8 @@ public class MappingRule {
      * consecutive valid key character instead (e.g. {@link #SHELL}:
      * {@code $key}).</p>
      *
-     * @param prefix the opening delimiter; must not be {@code null}
-     * @param suffix the closing delimiter; must not be {@code null},
+     * @param prefix the opening delimiter; never {@code null}
+     * @param suffix the closing delimiter; never {@code null},
      *               may be empty to indicate an open-ended token boundary
      * @throws IllegalArgumentException if {@code prefix} is empty
      * @throws IllegalArgumentException if a prefix or suffix exceeds
@@ -155,9 +155,9 @@ public class MappingRule {
      * {@code mappings} is empty or {@code input} does not contain the
      * prefix string.</p>
      *
-     * @param input    the source text to process; must not be {@code null}
+     * @param input    the source text to process; never {@code null}
      * @param mappings the set of key-value substitutions to apply;
-     *                 must not be {@code null}
+     *                 never {@code null}
      * @return the substituted string; never {@code null}. Returns
      *         {@code input} unchanged when no tokens are found or
      *         {@code mappings} is empty.
@@ -307,7 +307,7 @@ public class MappingRule {
     /**
      * Determines equality based on the {@code prefix} and {@code suffix} pair.
      *
-     * @param obj the object to compare; may be {@code null}
+     * @param obj the object to compare; can be {@code null}
      * @return {@code true} if {@code obj} is a {@link MappingRule} with
      *         the same prefix and suffix
      */

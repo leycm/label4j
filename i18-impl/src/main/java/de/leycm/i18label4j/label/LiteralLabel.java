@@ -57,8 +57,8 @@ public class LiteralLabel implements Label {
     /**
      * Constructs a new {@link LiteralLabel} with an empty mapping set.
      *
-     * @param provider the owning provider; must not be {@code null}
-     * @param literal  the fixed text value; must not be {@code null}
+     * @param provider the owning provider; never {@code null}
+     * @param literal  the fixed text value; never {@code null}
      */
     public LiteralLabel(final @NonNull LabelProvider provider,
                         final @NonNull String literal) {
@@ -71,9 +71,9 @@ public class LiteralLabel implements Label {
      * <p>This constructor is intended for internal use only, for example
      * when cloning an existing label with pre-populated mappings.</p>
      *
-     * @param provider the owning provider; must not be {@code null}
-     * @param mappings the initial set of mappings; must not be {@code null}
-     * @param literal  the fixed text value; must not be {@code null}
+     * @param provider the owning provider; never {@code null}
+     * @param mappings the initial set of mappings; never {@code null}
+     * @param literal  the fixed text value; never {@code null}
      */
     @ApiStatus.Internal
     public LiteralLabel(final @NonNull LabelProvider provider,
@@ -124,7 +124,7 @@ public class LiteralLabel implements Label {
     /**
      * {@inheritDoc}
      *
-     * @param mapping the mapping to register; must not be {@code null}
+     * @param mapping the mapping to register; never {@code null}
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
@@ -144,7 +144,7 @@ public class LiteralLabel implements Label {
     /**
      * Returns the literal string, ignoring the given locale entirely.
      *
-     * @param locale the requested locale (ignored); must not be {@code null}
+     * @param locale the requested locale (ignored); never {@code null}
      * @return the literal string; never {@code null}
      */
     @Override
@@ -185,7 +185,7 @@ public class LiteralLabel implements Label {
      * <p>Two {@link LiteralLabel} instances are equal when they share the
      * same {@link LabelProvider} and the same literal string.</p>
      *
-     * @param obj the object to compare; may be {@code null}
+     * @param obj the object to compare; can be {@code null}
      * @return {@code true} if {@code obj} is a {@link LiteralLabel} with
      *         an equal provider and literal
      */

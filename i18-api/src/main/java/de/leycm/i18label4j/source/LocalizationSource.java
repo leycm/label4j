@@ -71,7 +71,7 @@ public interface LocalizationSource extends Iterable<Locale> {
      * when the locale is unknown, or {@link IOException} when
      * the underlying resource cannot be read.</p>
      *
-     * @param locale the locale to load translations for; must not be {@code null}
+     * @param locale the locale to load translations for; never {@code null}
      * @return a map from translation key to translated value; never {@code null}
      * @throws Exception if the translations cannot be loaded for any reason;
      *                   the exact exception type is implementation-defined
@@ -86,7 +86,7 @@ public interface LocalizationSource extends Iterable<Locale> {
      * and checks for membership. Implementations may override this with a
      * more efficient check that does not require materializing the full set.</p>
      *
-     * @param locale the locale to test; must not be {@code null}
+     * @param locale the locale to test; never {@code null}
      * @return {@code true} if the locale is available; {@code false} otherwise
      */
     default boolean containsLocalization(@NonNull Locale locale) {

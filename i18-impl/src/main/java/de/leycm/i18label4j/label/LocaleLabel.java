@@ -42,7 +42,7 @@ import java.util.function.Function;
  *
  * <p>Equality is based on the combination of owning provider and
  * translation key, so two locale labels with the same key and provider
- * are considered equal regardless of their fallback functions.</p>
+ * are considered equal regardless of their fallback.</p>
  *
  * <p>Thread Safety: This class is not thread-safe. The mutable
  * {@code mappings} set is not synchronized; instances must not be
@@ -62,16 +62,16 @@ public class LocaleLabel implements Label {
     private final Set<Mapping> mappings;
     // the translation key for lookups
     private final String key;
-    // the fallback function for missing translations
+    // the fallback for missing translations; can be null
     private final @Nullable String fallback;
 
     /**
      * Constructs a new {@link LocaleLabel} with an empty mapping set.
      *
-     * @param provider the owning provider; must not be {@code null}
-     * @param key      the translation key; must not be {@code null}
+     * @param provider the owning provider; never {@code null}
+     * @param key      the translation key; never {@code null}
      * @param fallback the function that produces a fallback string when
-     *                 no translation is available; must not be {@code null}
+     *                 no translation is available; can be {@code null}
      */
     public LocaleLabel(final @NonNull LabelProvider provider,
                        final @NonNull String key,
@@ -85,11 +85,11 @@ public class LocaleLabel implements Label {
      * <p>This constructor is intended for internal use only, for example
      * when cloning an existing label with pre-populated mappings.</p>
      *
-     * @param provider the owning provider; must not be {@code null}
-     * @param mappings the initial set of mappings; must not be {@code null}
-     * @param key      the translation key; must not be {@code null}
+     * @param provider the owning provider; never {@code null}
+     * @param mappings the initial set of mappings; never {@code null}
+     * @param key      the translation key; never {@code null}
      * @param fallback the function that produces a fallback string when
-     *                 no translation is available; must not be {@code null}
+     *                 no translation is available; can be {@code null}
      */
     @ApiStatus.Internal
     public LocaleLabel(final @NonNull LabelProvider provider,
@@ -153,7 +153,7 @@ public class LocaleLabel implements Label {
     /**
      * {@inheritDoc}
      *
-     * @param mapping the mapping to register; must not be {@code null}
+     * @param mapping the mapping to register; never {@code null}
      * @return this label for method chaining; never {@code null}
      * @throws IllegalArgumentException if a mapping with the same key
      *                                  already exists on this label
@@ -174,12 +174,7 @@ public class LocaleLabel implements Label {
      * Looks up the translation for the given locale via the
      * {@link LabelProvider}.
      *
-     * <p>The fallback function is evaluated and passed to
-     * {@link LabelProvider#translate(Locale, String, String)} so that
-     * the provider applies its own locale-fallback logic before
-     * resorting to the function's result.</p>
-     *
-     * @param locale the target locale; must not be {@code null}
+     * @param locale the target locale; never {@code null}
      * @return the translated string or the fallback value;
      *         never {@code null}
      * @throws IllegalArgumentException if the locale's translation data
@@ -222,9 +217,9 @@ public class LocaleLabel implements Label {
      *
      * <p>Two {@link LocaleLabel} instances are equal when they share the
      * same {@link LabelProvider} and the same translation key, regardless
-     * of their fallback functions.</p>
+     * of their fallback value.</p>
      *
-     * @param obj the object to compare; may be {@code null}
+     * @param obj the object to compare; can be {@code null}
      * @return {@code true} if {@code obj} is a {@link LocaleLabel} with
      *         an equal provider and key
      */

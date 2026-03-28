@@ -95,9 +95,9 @@ public class CommonLabelProvider implements LabelProvider {
          * it is silently replaced.</p>
          *
          * @param type       the target class this serializer handles;
-         *                   must not be {@code null}
+         *                   never {@code null}
          * @param serializer the serializer implementation;
-         *                   must not be {@code null}
+         *                   never {@code null}
          * @return this builder for method chaining; never {@code null}
          * @throws NullPointerException if {@code type} or {@code serializer}
          *                              is {@code null}
@@ -114,7 +114,7 @@ public class CommonLabelProvider implements LabelProvider {
          *
          * <p>Defaults to {@link MappingRule#DOLLAR_CURLY} if not set.</p>
          *
-         * @param rule the mapping rule; must not be {@code null}
+         * @param rule the mapping rule; never {@code null}
          * @return this builder for method chaining; never {@code null}
          * @throws NullPointerException if {@code rule} is {@code null}
          */
@@ -129,7 +129,7 @@ public class CommonLabelProvider implements LabelProvider {
          *
          * <p>Defaults to {@link Locale#getDefault()} if not set.</p>
          *
-         * @param locale the default locale; must not be {@code null}
+         * @param locale the default locale; never {@code null}
          * @return this builder for method chaining; never {@code null}
          * @throws NullPointerException if {@code locale} is {@code null}
          */
@@ -142,7 +142,7 @@ public class CommonLabelProvider implements LabelProvider {
          * Builds the {@link CommonLabelProvider} with the configured settings
          * and the given {@link LocalizationSource}.
          *
-         * @param source the localization source to use; must not be {@code null}
+         * @param source the localization source to use; never {@code null}
          * @return a new {@link CommonLabelProvider}; never {@code null}
          * @throws NullPointerException if {@code source} is {@code null}
          */
@@ -157,9 +157,9 @@ public class CommonLabelProvider implements LabelProvider {
          * <p>Equivalent to calling {@link #build(LocalizationSource)} followed
          * by {@link LabelProvider#warmUp(Locale...)}.</p>
          *
-         * @param source  the localization source to use; must not be {@code null}
-         * @param locales the locales to preload; must not be {@code null},
-         *                individual elements must not be {@code null}
+         * @param source  the localization source to use; never {@code null}
+         * @param locales the locales to preload; never {@code null},
+         *                individual elements never {@code null}
          * @return a new, pre-warmed {@link CommonLabelProvider}; never {@code null}
          * @throws IllegalArgumentException if any locale's translation data
          *                                  cannot be loaded from the source
@@ -175,8 +175,6 @@ public class CommonLabelProvider implements LabelProvider {
         }
     }
 
-    // ==== Factory ==========================================================
-
     /**
      * Creates and returns a new {@link Builder} instance.
      *
@@ -190,9 +188,11 @@ public class CommonLabelProvider implements LabelProvider {
     // ==== Instance State ===================================================
 
     // locale language-tag -> (translation key -> LocalizedResult)
-    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Localization>> translationCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Localization>>
+            translationCache = new ConcurrentHashMap<>();
     // target class -> serializer
-    private final ConcurrentHashMap<Class<?>, LabelSerializer<?>> serializerRegistry = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<?>, LabelSerializer<?>>
+            serializerRegistry = new ConcurrentHashMap<>();
 
     private final @NonNull LocalizationSource localizationSource;
     private final @NonNull MappingRule defaultMappingRule;
@@ -206,13 +206,13 @@ public class CommonLabelProvider implements LabelProvider {
      * for a more readable construction experience.</p>
      *
      * @param serializers      serializers to register, keyed by target class;
-     *                         must not be {@code null}
+     *                         never {@code null}
      * @param defaultMappingRule the mapping rule used when none is specified;
-     *                           must not be {@code null}
+     *                           never {@code null}
      * @param source           the localization source for raw translation data;
-     *                         must not be {@code null}
+     *                         never {@code null}
      * @param defaultLocale    the locale used when none is specified;
-     *                         must not be {@code null}
+     *                         never {@code null}
      * @throws NullPointerException if any parameter is {@code null}
      */
     public CommonLabelProvider(
@@ -261,9 +261,9 @@ public class CommonLabelProvider implements LabelProvider {
     /**
      * {@inheritDoc}
      *
-     * @param key      the translation key; must not be {@code null}
+     * @param key      the translation key; never {@code null}
      * @param fallback the value supplier for missing translations;
-     *                 must not be {@code null}
+     *                 never {@code null}
      * @return a new locale-aware label; never {@code null}
      */
     @Override
@@ -276,7 +276,7 @@ public class CommonLabelProvider implements LabelProvider {
     /**
      * {@inheritDoc}
      *
-     * @param literal the fixed text value; must not be {@code null}
+     * @param literal the fixed text value; never {@code null}
      * @return a new literal label; never {@code null}
      */
     @Override
@@ -298,8 +298,8 @@ public class CommonLabelProvider implements LabelProvider {
      * is the default locale, in which case a {@code null}-wrapped result
      * is returned immediately).</p>
      *
-     * @param locale the target locale; must not be {@code null}
-     * @param key    the translation key; must not be {@code null}
+     * @param locale the target locale; never {@code null}
+     * @param key    the translation key; never {@code null}
      * @return a {@link Localization} wrapping the translation or
      *         {@code null}; never {@code null}
      * @throws NullPointerException     if any parameter is {@code null}
@@ -337,7 +337,7 @@ public class CommonLabelProvider implements LabelProvider {
      * possible.</p>
      *
      * @param locale the locale whose map should be loaded;
-     *               must not be {@code null}
+     *               never {@code null}
      * @return the (possibly empty) translation map; never {@code null}
      * @throws NullPointerException     if {@code locale} is {@code null}
      * @throws IllegalArgumentException if the source fails to load the
@@ -383,8 +383,8 @@ public class CommonLabelProvider implements LabelProvider {
      * {@inheritDoc}
      *
      * @param <T>   the target type
-     * @param label the label to serialize; must not be {@code null}
-     * @param type  the class of the target type; must not be {@code null}
+     * @param label the label to serialize; never {@code null}
+     * @param type  the class of the target type; never {@code null}
      * @return the serialized value; never {@code null}
      * @throws SerializationException   if the serializer fails
      * @throws IllegalArgumentException if no serializer is registered
@@ -408,7 +408,7 @@ public class CommonLabelProvider implements LabelProvider {
      * {@inheritDoc}
      *
      * @param <T>        the source type
-     * @param serialized the serialized representation; must not be {@code null}
+     * @param serialized the serialized representation; never {@code null}
      * @return the reconstructed label; never {@code null}
      * @throws DeserializationException if the serializer fails
      * @throws IllegalArgumentException if no serializer is registered for
@@ -431,8 +431,8 @@ public class CommonLabelProvider implements LabelProvider {
      * {@inheritDoc}
      *
      * @param <T>   the target type
-     * @param input the raw string to format; must not be {@code null}
-     * @param type  the class of the target type; must not be {@code null}
+     * @param input the raw string to format; never {@code null}
+     * @param type  the class of the target type; never {@code null}
      * @return the formatted value; never {@code null}
      * @throws FormatException          if the formatter fails
      * @throws IllegalArgumentException if no serializer is registered
@@ -461,7 +461,7 @@ public class CommonLabelProvider implements LabelProvider {
      *
      * @param <T>  the target type
      * @param type the target class whose serializer should be retrieved;
-     *             must not be {@code null}
+     *             never {@code null}
      * @return the typed serializer, or {@code null} if none is registered
      * @throws IncompatibleMatchException if the registered serializer's
      *                                    generic type is incompatible with
@@ -498,7 +498,7 @@ public class CommonLabelProvider implements LabelProvider {
      * before the entry is removed from the outer cache.</p>
      *
      * @param locale the locale whose cache should be evicted;
-     *               must not be {@code null}
+     *               never {@code null}
      */
     @Override
     public void clearCache(final @NonNull Locale locale) {
@@ -509,8 +509,8 @@ public class CommonLabelProvider implements LabelProvider {
     /**
      * {@inheritDoc}
      *
-     * @param locale the locales to evict; must not be {@code null},
-     *               individual elements must not be {@code null}
+     * @param locale the locales to evict; never {@code null},
+     *               individual elements never {@code null}
      */
     @Override
     public void clearCache(final @NonNull Locale @NonNull ... locale) {
