@@ -137,6 +137,17 @@ public class LocaleLabel implements Label {
         return key;
     }
 
+    /**
+     * Returns the fallback for the default locale, used
+     * when no translation is found for the requested
+     * locale or the provider's default locale.
+     *
+     * @return the fallback value for the default Local; never {@code null}
+     */
+    public @NonNull String getFallback() {
+        return fallback.apply(provider.getDefaultLocale());
+    }
+
     // ==== Mapping Registration ===============================================
 
     /**

@@ -225,7 +225,7 @@ public interface LabelProvider extends Instanceable {
      * <p>Looks up the registered
      * {@link LabelSerializer} for the
      * runtime type of {@code serialized} and delegates to its
-     * {@link LabelSerializer#deserialize(Object)}
+     * {@link LabelSerializer#deserialize(Object, LabelProvider)}
      * method.</p>
      *
      * @param <T>        the source type

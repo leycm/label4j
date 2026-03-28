@@ -1,9 +1,10 @@
 dependencies {
     implementation(libs.leycm.init)
-    implementation(libs.annos.jetbrains)
-    implementation(project(":api"))
-    
     implementation(libs.bundles.parser)
+    implementation(project(":api"))
+    compileOnly(libs.annos.jetbrains)
+
+    compileOnly(libs.bundles.adventure)
 }
 
 tasks.named("sourcesJar") {

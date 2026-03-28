@@ -425,7 +425,7 @@ public class CommonLabelProvider implements LabelProvider {
         if (serializer == null)
             throw new IllegalArgumentException("Unsupported serialization type: " + type.getName());
 
-        return serializer.deserialize(serialized);
+        return serializer.deserialize(serialized, this);
     }
 
     /**

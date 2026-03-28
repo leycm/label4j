@@ -72,7 +72,7 @@ public interface LabelSerializer<T> {
      *                                  as a valid label (e.g. corrupt data,
      *                                  unrecognised format)
      */
-    @NonNull Label deserialize(@NonNull T serialized) throws DeserializationException;
+    @NonNull Label deserialize(@NonNull T serialized, @NonNull LabelProvider provider) throws DeserializationException;
 
     /**
      * Formats a raw string directly into the target type {@code T}
