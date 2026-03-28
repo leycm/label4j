@@ -38,7 +38,7 @@ import lombok.NonNull;
  * @see LabelSerializer
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-public interface BungeeCordComponentSerializer extends LabelSerializer<BaseComponent> {
+public interface BungeeChatSerializer extends LiteralFormatSerializer<BaseComponent> {
 
     // ==== BungeeCord Interface ==============================================
 
@@ -73,7 +73,7 @@ public interface BungeeCordComponentSerializer extends LabelSerializer<BaseCompo
      *
      * <p>If the array contains exactly one element that is a {@link TranslatableComponent},
      * it is converted to a locale-aware {@link Label} using the component's translation key.
-     * All other cases are converted to a {@link LiteralLabel} via {@link #toLiteral(BaseComponent)}.</p>
+     * All other cases are converted to a {@link LiteralLabel} via {@link #toLiteral(Object)}.</p>
      *
      * @param serialized the component array to deserialize; never {@code null}
      * @param provider   the label provider used to construct the result; never {@code null}
@@ -93,51 +93,19 @@ public interface BungeeCordComponentSerializer extends LabelSerializer<BaseCompo
         }
     }
 
-    /**
-     * Parses a raw string input into a BungeeCord {@link BaseComponent} array.
-     *
-     * @param input the string to parse; never {@code null}
-     * @return the resulting {@link BaseComponent} array; never {@code null}
-     * @throws FormatException when the input cannot be parsed
-     */
-    @Override
-    default @NonNull BaseComponent format(@NonNull String input) throws FormatException {
-        try {
-            return fromLiteral(input);
-        } catch (Exception e) {
-            throw new FormatException(input, e);
-        }
-    }
+    // ==== BungeeChat Types ==================================================
 
     /**
-     * Converts a BungeeCord {@link BaseComponent} array to its string literal representation.
-     *
-     * @param component the component to convert; never {@code null}
-     * @return the string literal; never {@code null}
-     */
-    @NonNull String toLiteral(@NonNull BaseComponent component);
-
-    /**
-     * Converts a string literal to a BungeeCord {@link BaseComponent} array.
-     *
-     * @param literal the string to parse; never {@code null}
-     * @return the resulting {@link BaseComponent} array; never {@code null}
-     */
-    @NonNull BaseComponent fromLiteral(@NonNull String literal);
-
-    // ==== BungeeJson ========================================================
-
-    /**
-     * {@link BungeeCordComponentSerializer} implementation using JSON formatting.
+     * {@link BungeeChatSerializer} implementation using JSON formatting.
      *
      * <p>Delegates to {@link ComponentSerializer#toString(BaseComponent[])} and
      * {@link ComponentSerializer#parse(String)} for serialization and deserialization.</p>
      *
      * @since 1.0.0
-     * @see BungeeCordComponentSerializer
+     * @see BungeeChatSerializer
      * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
      */
-    class BungeeJson implements BungeeCordComponentSerializer {
+    class BungeeJson implements BungeeChatSerializer {
 
         /**
          * Serializes the given {@link BaseComponent} array to a JSON string.
@@ -162,19 +130,17 @@ public interface BungeeCordComponentSerializer extends LabelSerializer<BaseCompo
         }
     }
 
-    // ==== BungeePlainText ===================================================
-
     /**
-     * {@link BungeeCordComponentSerializer} implementation using plain text formatting.
+     * {@link BungeeChatSerializer} implementation using plain text formatting.
      *
      * <p>Wraps raw text directly as a {@link TextComponent} without any JSON codec.
      * {@link #toLiteral(BaseComponent)} concatenates the plain text of all component.</p>
      *
      * @since 1.0.0
-     * @see BungeeCordComponentSerializer
+     * @see BungeeChatSerializer
      * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
      */
-    class BungeePlainText implements BungeeCordComponentSerializer {
+    class BungeePlainText implements BungeeChatSerializer {
 
         /**
          * Returns the concatenated plain text content of all given component.
@@ -199,19 +165,17 @@ public interface BungeeCordComponentSerializer extends LabelSerializer<BaseCompo
         }
     }
 
-    // ==== BungeeLegacy ======================================================
-
     /**
-     * {@link BungeeCordComponentSerializer} implementation using legacy section sign ({@code §}) formatting.
+     * {@link BungeeChatSerializer} implementation using legacy section sign ({@code §}) formatting.
      *
      * <p>Uses {@link TextComponent#fromLegacy(String)} to parse legacy-formatted strings
      * and {@link BaseComponent#toLegacyText()} to serialize back to legacy format.</p>
      *
      * @since 1.0.0
-     * @see BungeeCordComponentSerializer
+     * @see BungeeChatSerializer
      * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
      */
-    class BungeeLegacy implements BungeeCordComponentSerializer {
+    class BungeeLegacy implements BungeeChatSerializer {
 
         /**
          * Serializes the given {@link BaseComponent} array to a legacy section sign formatted string.
