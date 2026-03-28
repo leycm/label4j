@@ -173,7 +173,7 @@ public interface LabelProvider extends Instanceable {
      */
     @NonNull String translate(@NonNull Locale locale,
                               @NonNull String key,
-                              @NonNull String fallback) throws NullPointerException;
+                              @NonNull String fallback);
 
     // ==== Serialization ====================================================
 

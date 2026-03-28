@@ -10,13 +10,9 @@
  */
 package de.leycm.i18label4j.mapping;
 
-import lombok.Getter;
 import lombok.NonNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Defines the placeholder syntax used to substitute {@link Mapping}
@@ -25,16 +21,22 @@ import java.util.regex.Pattern;
  * <p>A {@link MappingRule} is constructed from a prefix and an optional
  * suffix that delimit placeholder tokens. For example,
  * {@link #DOLLAR_CURLY} matches {@code ${key}}, while
- * {@link #PERCENT} matches {@code %key%}. At construction time the rule
- * compiles an optimized {@link Pattern} and pre-computes escape-sequence
- * metadata so that {@link #apply(String, Set)} can run efficiently at
- * runtime.</p>
+ * {@link #PERCENT} matches {@code %key%}.</p>
  *
- * <p>The {@link #apply(String, Set)} method replaces all occurrences of
- * recognized placeholder tokens with their corresponding values from the
- * supplied {@link Set} of {@link Mapping} instances. Unrecognised tokens
- * are left unchanged. Escape sequences (backslash before the prefix)
- * are protected and restored after substitution.</p>
+ * <p>The {@link #apply(String, Set)} method scans the input character by
+ * character, identifying placeholder tokens by their surrounding delimiters
+ * and substituting them with values from the supplied {@link Set} of
+ * {@link Mapping} instances. Unrecognised tokens are left unchanged.</p>
+ *
+ * <p>Escape sequences: a backslash immediately before the prefix — are
+ * resolved inline: the backslash is consumed and the prefix is emitted
+ * literally, preventing the token from being treated as a placeholder.</p>
+ *
+ * <p>When a suffix is present, dot ({@code .}) is permitted inside key
+ * names (e.g. {@code ${user.name}}), enabling nested or namespaced keys.
+ * Without a suffix, key characters are limited to {@code A–Z}, {@code a–z},
+ * {@code 0–9}, underscore and hyphen, because the token boundary would
+ * otherwise be ambiguous.</p>
  *
  * <p>Thread Safety: Instances are effectively immutable after construction
  * and may be shared freely across threads.</p>
@@ -82,72 +84,51 @@ public class MappingRule {
 
     // ==== Internal Constants ================================================
 
-    // Characters with special meaning in Java regex
-    private static final String REGEX_META = "\\.^§$*+?()[]{}|";
-    // Regex capturing group for valid placeholder key characters
-    private static final String KEY_REGEX = "([A-Za-z0-9_\\-]+)";
-    // Internal sentinel used to protect escaped prefix sequences during apply()
-    private static final String ESCAPED_PREFIX = "\u0001P";
-    // Internal sentinel used to protect escaped suffix sequences during apply()
-    private static final String ESCAPED_SUFFIX = "\u0001S";
-    // Maximum allowed input length (1 MB) passed to apply()
+    // maximum allowed input length (1 MB) passed to apply()
     private static final int INPUT_LIMIT = 1_000_000;
-    // Maximum number of substitutions performed in a single apply() call
-    private static final int MAX_MATCHES = 10_000;
+    // maximum number of substitutions performed in a single apply() call
+    private static final int PLACEHOLDER_LIMIT = 10_000;
+    // maximum allowed prefix and suffix length
+    private static final int PREFIX_LIMIT = 5;
 
     private final @NonNull String prefix;
     private final @NonNull String suffix;
-    private final @NonNull Pattern pattern;
-
-    // null when prefix/suffix is empty (no escape processing needed)
-    private final @Nullable String escapedPrefixLiteral;
-    private final @Nullable String escapedSuffixLiteral;
-
-    // ==== Helper Methods ====================================================
-
-    // Escapes all regex metacharacters in {@code s} so the string can
-    // be used as a literal inside a compiled {@link Pattern}.
-    private static @NonNull String regexEscape(final @NonNull String s) {
-        StringBuilder sb = new StringBuilder(s.length() * 2);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (REGEX_META.indexOf(c) >= 0) sb.append('\\');
-            sb.append(c);
-        }
-        return sb.toString();
-    }
+    private final boolean hasSuffix;
 
     // ==== Public API =======================================================
 
     /**
      * Constructs a new {@link MappingRule} with the given delimiter pair.
      *
-     * <p>The prefix and suffix are escaped for use in a {@link Pattern}.
-     * If the suffix is empty the rule matches open-ended tokens
-     * (e.g. {@link #SHELL}: {@code $key}). Escape literals are computed
-     * to enable backslash-escaping of the prefix during
-     * {@link #apply(String, Set)}.</p>
+     * <p>The prefix marks where a placeholder token begins; the suffix marks
+     * where it ends. If the suffix is empty, the token extends to the last
+     * consecutive valid key character instead (e.g. {@link #SHELL}:
+     * {@code $key}).</p>
      *
-     * @param prefix the opening delimiter; must not be {@code null},
-     *               may be empty only when suffix is also empty
+     * @param prefix the opening delimiter; must not be {@code null}
      * @param suffix the closing delimiter; must not be {@code null},
-     *               may be empty
+     *               may be empty to indicate an open-ended token boundary
+     * @throws IllegalArgumentException if {@code prefix} is empty
+     * @throws IllegalArgumentException if a prefix or suffix exceeds
+     *                                  {@link #PREFIX_LIMIT} characters
      * @throws NullPointerException if {@code prefix} or {@code suffix}
      *                              is {@code null}
-     * @throws IllegalArgumentException if both {@code prefix} and
-     *                                  {@code suffix} are empty
      */
     public MappingRule(final @NonNull String prefix, final @NonNull String suffix) {
-        this.prefix = prefix;
-        this.suffix = suffix;
+        this.prefix    = prefix;
+        this.suffix    = suffix;
+        this.hasSuffix = !suffix.isEmpty();
 
-        this.escapedPrefixLiteral = prefix.isEmpty() ? null : "\\" + prefix;
-        this.escapedSuffixLiteral = suffix.isEmpty() ? null : "\\" + suffix;
+        if (prefix.isEmpty()) {
+            throw new IllegalArgumentException("prefix must not be empty");
+        }
 
-        if (suffix.isEmpty()) {
-            this.pattern = Pattern.compile(regexEscape(prefix) + KEY_REGEX, Pattern.UNICODE_CASE);
-        } else {
-            this.pattern = Pattern.compile(regexEscape(prefix) + KEY_REGEX + regexEscape(suffix));
+        if (prefix.length() > PREFIX_LIMIT) {
+            throw new IllegalArgumentException("prefix must not exceed " + PREFIX_LIMIT + " characters");
+        }
+
+        if (suffix.length() > PREFIX_LIMIT) {
+            throw new IllegalArgumentException("suffix must not exceed " + PREFIX_LIMIT + " characters");
         }
     }
 
@@ -155,18 +136,24 @@ public class MappingRule {
      * Replaces all placeholder tokens in {@code input} with the values
      * from the supplied {@link Set} of {@link Mapping} instances.
      *
-     * <p>The method first checks whether the prefix is present at all;
-     * if not, {@code input} is returned as-is without any allocation.
-     * When at least one match is possible, a lookup map is built from
-     * the mappings and the compiled {@link #pattern} is applied.</p>
+     * <p>The input is scanned character by character. When the prefix is
+     * detected, the key is extracted either up to the next occurrence of the
+     * suffix (when one is configured) or up to the last consecutive valid
+     * key character (when no suffix is configured). If the extracted key is
+     * present in {@code mappings}, the entire token — including delimiters —
+     * is replaced by the mapped value. Unknown keys are emitted unchanged,
+     * including their surrounding delimiters.</p>
      *
-     * <p>Escape sequences — a backslash immediately before the prefix —
-     * are protected before substitution and restored afterward, allowing
-     * callers to include literal prefix characters in the output.</p>
+     * <p>Escape sequences: a backslash immediately before the prefix — are
+     * resolved inline: the backslash is consumed and the prefix characters
+     * are appended literally to the output, with no further token matching
+     * attempted at that position.</p>
      *
-     * <p>The method enforces two safety limits: inputs longer than
-     * {@code 1 000 000} characters are rejected, and at most
-     * {@code 10 000} substitutions are performed per call.</p>
+     * <p>Two safety limits are enforced: inputs longer than {@code 1 000 000}
+     * characters are rejected with an {@link IllegalArgumentException}, and
+     * the method returns the input unchanged without scanning when
+     * {@code mappings} is empty or {@code input} does not contain the
+     * prefix string.</p>
      *
      * @param input    the source text to process; must not be {@code null}
      * @param mappings the set of key-value substitutions to apply;
@@ -175,88 +162,133 @@ public class MappingRule {
      *         {@code input} unchanged when no tokens are found or
      *         {@code mappings} is empty.
      * @throws IllegalArgumentException if {@code input} exceeds
-     *                                  {@code 1 000 000} characters
+     *                                  {@link #INPUT_LIMIT} characters
+     * @throws IllegalArgumentException if more than {@link #PLACEHOLDER_LIMIT}
+     *                                  placeholder registered
      * @throws NullPointerException     if {@code input} or {@code mappings}
      *                                  is {@code null}
      */
     public @NonNull String apply(final @NonNull String input,
                                  final @NonNull Set<Mapping> mappings) {
-        if (input.length() > INPUT_LIMIT) throw new IllegalArgumentException("Input too large");
-        if (mappings.isEmpty() || input.isEmpty()) return input;
+        if (input.length() > INPUT_LIMIT) throw new IllegalArgumentException("Input too large " + INPUT_LIMIT);
+        if (input.isEmpty() || mappings.isEmpty()) return input;
+        if (!input.contains(prefix)) return input;
 
-        int firstPrefix = input.indexOf(prefix);
-        if (firstPrefix < 0) return input;
 
         final Map<String, String> lookup = buildLookup(mappings);
+        final int   len    = input.length();
+        final int   pLen   = prefix.length();
+        final int   sLen   = suffix.length();
+        final StringBuilder sb = new StringBuilder(len + 32);
 
-        boolean hasEscape = !prefix.isEmpty() && input.indexOf('\\') >= 0
-                && input.indexOf('\\' + prefix.charAt(0)) >= 0;
-
-        String working = hasEscape ? protectEscapes(input) : input;
-
-        Matcher matcher = pattern.matcher(working);
-
-        StringBuilder sb = null;
-        int lastEnd = 0;
-        int matchCount = 0;
-
-        while (matcher.find()) {
-            if (++matchCount > MAX_MATCHES) break;
-
-            String key = matcher.group(1);
-            String replacement = lookup.get(key);
-            if (replacement == null) continue;
-
-            if (sb == null) {
-                sb = new StringBuilder(working.length() + 32);
-            }
-
-            sb.append(working, lastEnd, matcher.start());
-            sb.append(replacement);
-            lastEnd = matcher.end();
+        if (lookup.size() > PLACEHOLDER_LIMIT) {
+            throw new IllegalArgumentException("too many mappings: " + lookup.size() +
+                    " (maximum allowed is " + PLACEHOLDER_LIMIT + ")");
         }
 
-        if (sb == null) return input;
+        int i = 0;
+        while (i < len) {
 
-        sb.append(working, lastEnd, working.length());
+            if (input.charAt(i) == '\\' && startsWith(input, prefix, i + 1)) {
+                // result: escape sequence: backslash immediately before prefix
+                sb.append(prefix);
+                i += 1 + pLen;
+                continue;
+            }
 
-        String result = sb.toString();
-        return hasEscape ? restoreEscapes(result) : result;
+            if (!startsWith(input, prefix, i)) {
+                // result: prefix not found at current position
+                sb.append(input.charAt(i++));
+                continue;
+            }
+
+            int keyStart = i + pLen;
+            int keyEnd   = keyStart;
+
+            if (hasSuffix) {
+                // suffix: key extends to next occurrence of suffix
+                int suffixPos = input.indexOf(suffix, keyStart);
+                if (suffixPos < 0) {
+                    sb.append(input.charAt(i++));
+                    continue;
+                }
+                keyEnd = suffixPos;
+
+                // note: validate key characters skip replace if any char is illegal
+                boolean validKey = true;
+                for (int k = keyStart; k < keyEnd; k++) {
+                    if (!isKeyChar(input.charAt(k))) {
+                        validKey = false;
+                        break;
+                    }
+                }
+
+                if (!validKey) {
+                    sb.append(input.charAt(i++));
+                    continue;
+                }
+            } else {
+                // no suffix: key extends to last consecutive valid key character
+                while (keyEnd < len && isKeyChar(input.charAt(keyEnd))) keyEnd++;
+            }
+
+            if (keyEnd == keyStart) {
+                // result: empty key, treat prefix as literal
+                sb.append(input.charAt(i++));
+                continue;
+            }
+
+            String key   = input.substring(keyStart, keyEnd);
+            String value = lookup.get(key);
+
+            if (value != null) {
+                sb.append(value);
+            } else {
+                // unknown key, emit token unchanged
+                sb.append(prefix).append(key);
+                if (hasSuffix) sb.append(suffix);
+            }
+
+            i = keyEnd + (hasSuffix ? sLen : 0);
+        }
+
+        return sb.toString();
     }
 
     // ==== Internal Implementation ===========================================
+
+    // Returns {@code true} if {@code s} contains {@code sub} starting at
+    // {@code from}, without throwing when {@code from} is out of bounds.
+    private boolean startsWith(final String s, final String sub, final int from) {
+        if (from < 0 || from + sub.length() > s.length()) return false;
+        return s.startsWith(sub, from);
+    }
+
+    // Returns {@code true} if {@code c} is a valid placeholder key character.
+    // Allowed: A-Z, a-z, 0-9, underscore, hyphen.
+    // Dot is only allowed when a suffix is present (e.g. ${user.name}),
+    // since without a suffix the token boundary would be ambiguous.
+    private boolean isKeyChar(final char c) {
+        return (c >= 'A' && c <= 'Z')
+                || (c >= 'a' && c <= 'z')
+                || (c >= '0' && c <= '9')
+                || c == '_' || c == '-'
+                || (c == '.' && hasSuffix);
+    }
 
     // Builds a flat {@link Map} from key to string value for fast O(1)
     // lookup during the replacement loop in {@link #apply(String, Set)}.
     // For single-entry sets an immutable singleton map is returned to
     // avoid an unnecessary {@link HashMap} allocation.
-    private @NonNull Map<String, String> buildLookup(final @NonNull Set<Mapping> mappings) {
-        int size = mappings.size();
-        if (size == 1) {
+    private @NonNull Map<String, String> buildLookup(
+            final @NonNull Set<Mapping> mappings) {
+        if (mappings.size() == 1) {
             Mapping m = mappings.iterator().next();
             return Map.of(m.key(), m.valueAsString());
         }
-        Map<String, String> map = new HashMap<>((int) (size / 0.75f) + 1);
+        Map<String, String> map = new HashMap<>((int)(mappings.size() / 0.75f) + 1);
         for (Mapping m : mappings) map.put(m.key(), m.valueAsString());
         return map;
-    }
-
-    // Replaces escaped prefix and suffix sequences in {@code s} with
-    // internal sentinel strings so they are not treated as token
-    // delimiters during {@link #apply(String, Set)}.
-    private @NonNull String protectEscapes(@NonNull String s) {
-        if (escapedPrefixLiteral != null) s = s.replace(escapedPrefixLiteral, ESCAPED_PREFIX);
-        if (escapedSuffixLiteral != null) s = s.replace(escapedSuffixLiteral, ESCAPED_SUFFIX);
-        return s;
-    }
-
-    // Replaces internal sentinel strings back with the original prefix
-    // and suffix characters after the substitution step in
-    // {@link #apply(String, Set)}.
-    private @NonNull String restoreEscapes(@NonNull String s) {
-        if (escapedPrefixLiteral != null) s = s.replace(ESCAPED_PREFIX, prefix);
-        if (escapedSuffixLiteral != null) s = s.replace(ESCAPED_SUFFIX, suffix);
-        return s;
     }
 
     // ==== Object Methods ===================================================
