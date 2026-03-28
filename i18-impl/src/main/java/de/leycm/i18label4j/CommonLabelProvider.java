@@ -302,7 +302,7 @@ public class CommonLabelProvider implements LabelProvider {
     public @NonNull String translate(final @NonNull Locale locale,
                                      final @NonNull String key,
                                      final @NonNull String fallback
-    ) throws NullPointerException, IllegalArgumentException {
+    ) throws IllegalArgumentException {
         return translate(locale, key).or(fallback);
     }
 
@@ -329,7 +329,7 @@ public class CommonLabelProvider implements LabelProvider {
     @ApiStatus.Internal
     public @NonNull LocalizedResult translate(final @NonNull Locale locale,
                                               final @NonNull String key)
-            throws NullPointerException, IllegalArgumentException {
+            throws IllegalArgumentException {
 
         final Map<String, LocalizedResult> localeMap = loadLocaleMap(locale);
 
@@ -366,7 +366,7 @@ public class CommonLabelProvider implements LabelProvider {
      */
     @ApiStatus.Internal
     public @NonNull ConcurrentMap<String, LocalizedResult> loadLocaleMap(final @NonNull Locale locale)
-            throws NullPointerException, IllegalArgumentException {
+            throws IllegalArgumentException {
 
         AtomicReference<IllegalArgumentException> loadException = new AtomicReference<>();
 
