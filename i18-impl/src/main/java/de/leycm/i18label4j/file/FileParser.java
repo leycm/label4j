@@ -11,7 +11,6 @@
 package de.leycm.i18label4j.file;
 
 import com.google.gson.JsonParseException;
-
 import com.moandjiezana.toml.Toml;
 import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
