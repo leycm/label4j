@@ -36,10 +36,10 @@ mcstructs-itemcomponents = { group = "net.lenni0451.mcstructs", name="itemcompon
 
 bungee-chat = { group = "net.md-5", name = "bungeecord-chat", version = "1.21-R0.2" }
 
-javafx-base = { group = "org.openjfx", name = "javafx-base", version = "22.0.1" }
-javafx-graphics = { group = "org.openjfx", name = "javafx-graphics", version = "22.0.1" }
-javafx-controls = { group = "org.openjfx", name = "javafx-controls", version = "22.0.1" }
-javafx-fxml = { group = "org.openjfx", name = "javafx-fxml", version = "22.0.1" }
+javafx-base = { group = "org.openjfx", name = "javafx-base", version = "21.0.1"}
+javafx-graphics = { group = "org.openjfx", name = "javafx-graphics", version = "21.0.1"}
+javafx-controls = { group = "org.openjfx", name = "javafx-controls", version = "21.0.1"}
+javafx-fxml = { group = "org.openjfx", name = "javafx-fxml", version = "21.0.1"}
 
 leycm-init = { group = "de.leycm", name = "init4j-api", version = "1.2" }
 leycm-label = { group = "de.leycm", name = "i18label4j-api", version = "1.0" }

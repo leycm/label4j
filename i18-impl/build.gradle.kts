@@ -4,7 +4,9 @@ dependencies {
     implementation(project(":api"))
     compileOnly(libs.annos.jetbrains)
 
-    // text libs for API compatibility
+    compileOnly(variantOf(libs.javafx.controls) { classifier("linux") })
+    compileOnly(variantOf(libs.javafx.graphics) { classifier("linux") })
+    compileOnly(variantOf(libs.javafx.base) { classifier("linux") })
     compileOnly(libs.mcstructs.text)
     compileOnly(libs.bungee.chat)
     compileOnly(libs.javafx.controls)
