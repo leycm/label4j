@@ -51,6 +51,14 @@ public interface Label extends Mappable<Label> {
 
     // ==== Factory Methods ===================================================
 
+    static <T> @NonNull LabelConstructor<T> constructor(final @NonNull String key, Class<T> type) {
+        return new LabelConstructor<>(key, null);
+    }
+
+    static <T> @NonNull LabelConstructor<T> constructor(final @NonNull String key, final @Nullable String fallback, Class<T> type) {
+        return new LabelConstructor<>(key, fallback);
+    }
+
     /**
      * Creates a translatable label for the given key using the default {@link LabelProvider}.
      *
