@@ -75,7 +75,7 @@ public interface Label {
      * @throws NullPointerException if {@code key} is {@code null}
      */
     static @NonNull Label of(final @NonNull String key,
-                             final @NonNull String fallback) {
+                             final @Nullable String fallback) {
         return of(LabelProvider.getInstance(), key, fallback);
     }
 
