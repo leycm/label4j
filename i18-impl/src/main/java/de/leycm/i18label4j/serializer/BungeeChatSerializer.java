@@ -56,9 +56,9 @@ public interface BungeeChatSerializer extends LiteralFormatSerializer<BaseCompon
     @Override
     default @NonNull BaseComponent serialize(final @NonNull Label label) throws SerializationException {
         try {
-            if (label instanceof LocaleLabel locale) {
+            if (label instanceof final LocaleLabel locale) {
                 return new TranslatableComponent(locale.getKey());
-            } else if (label instanceof LiteralLabel literal) {
+            } else if (label instanceof final LiteralLabel literal) {
                 return fromLiteral(literal.getLiteral());
             } else {
                 throw new SerializationException("Unsupported label type: " + label.getClass().getName());
@@ -83,7 +83,7 @@ public interface BungeeChatSerializer extends LiteralFormatSerializer<BaseCompon
     @Override
     default @NonNull Label deserialize(final @NonNull BaseComponent serialized, final @NonNull LabelProvider provider) throws DeserializationException {
         try {
-            if (serialized instanceof TranslatableComponent translatable) {
+            if (serialized instanceof final TranslatableComponent translatable) {
                 return Label.of(provider, translatable.getTranslate());
             } else {
                 return Label.literal(provider, toLiteral(serialized));

@@ -57,9 +57,9 @@ public interface MCStructsTextSerializer extends LiteralFormatSerializer<TextCom
     @Override
     default @NonNull TextComponent serialize(final @NonNull Label label) throws SerializationException {
         try {
-            if (label instanceof LocaleLabel locale) {
+            if (label instanceof final LocaleLabel locale) {
                 return new TranslationComponent(locale.getKey());
-            } else if (label instanceof LiteralLabel literal) {
+            } else if (label instanceof final LiteralLabel literal) {
                 return fromLiteral(literal.getLiteral());
             } else {
                 throw new SerializationException("Unsupported label type: " + label.getClass().getName());
@@ -84,7 +84,7 @@ public interface MCStructsTextSerializer extends LiteralFormatSerializer<TextCom
     @Override
     default @NonNull Label deserialize(final @NonNull TextComponent serialized, final @NonNull LabelProvider provider) throws DeserializationException {
         try {
-            if (serialized instanceof TranslationComponent translatable) {
+            if (serialized instanceof final TranslationComponent translatable) {
                 return Label.of(provider, translatable.getKey());
             } else {
                 return Label.literal(provider, toLiteral(serialized));

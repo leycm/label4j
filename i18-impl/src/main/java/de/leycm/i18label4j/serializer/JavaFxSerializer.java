@@ -57,9 +57,9 @@ public interface JavaFxSerializer extends LiteralFormatSerializer<Node> {
     @Override
     default @NonNull Node serialize(final @NonNull Label label) throws SerializationException {
         try {
-            if (label instanceof LocaleLabel locale) {
+            if (label instanceof final LocaleLabel locale) {
                 return new Text(locale.getKey());
-            } else if (label instanceof LiteralLabel literal) {
+            } else if (label instanceof final LiteralLabel literal) {
                 return fromLiteral(literal.getLiteral());
             } else {
                 throw new SerializationException("Unsupported label type: " + label.getClass().getName());
@@ -85,7 +85,7 @@ public interface JavaFxSerializer extends LiteralFormatSerializer<Node> {
     @Override
     default @NonNull Label deserialize(final @NonNull Node serialized, final @NonNull LabelProvider provider) throws DeserializationException {
         try {
-            if (serialized instanceof Text text) {
+            if (serialized instanceof final Text text) {
                 return Label.of(provider, text.getText());
             } else {
                 return Label.literal(provider, toLiteral(serialized));
@@ -121,8 +121,8 @@ public interface JavaFxSerializer extends LiteralFormatSerializer<Node> {
          */
         @Override
         public @NonNull String toLiteral(@NonNull Node node) {
-            if (node instanceof Text text) return text.getText();
-            if (node instanceof Labeled labeled) return labeled.getText();
+            if (node instanceof final Text text) return text.getText();
+            if (node instanceof final Labeled labeled) return labeled.getText();
             return "";
         }
 
@@ -163,8 +163,8 @@ public interface JavaFxSerializer extends LiteralFormatSerializer<Node> {
          */
         @Override
         public @NonNull String toLiteral(@NonNull Node node) {
-            if (node instanceof Labeled labeled) return labeled.getText();
-            if (node instanceof Text text) return text.getText();
+            if (node instanceof final Labeled labeled) return labeled.getText();
+            if (node instanceof final Text text) return text.getText();
             return "";
         }
 
@@ -204,14 +204,14 @@ public interface JavaFxSerializer extends LiteralFormatSerializer<Node> {
          */
         @Override
         public @NonNull String toLiteral(@NonNull Node node) {
-            if (node instanceof TextFlow flow) {
+            if (node instanceof final TextFlow flow) {
                 final StringBuilder sb = new StringBuilder();
                 flow.getChildren().forEach(child -> {
-                    if (child instanceof Text text) sb.append(text.getText());
+                    if (child instanceof final Text text) sb.append(text.getText());
                 });
                 return sb.toString();
             }
-            if (node instanceof Text text) return text.getText();
+            if (node instanceof final Text text) return text.getText();
             return "";
         }
 

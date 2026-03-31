@@ -55,9 +55,9 @@ public interface SwingComponentSerializer extends LiteralFormatSerializer<JCompo
     @Override
     default @NonNull JComponent serialize(final @NonNull Label label) throws SerializationException {
         try {
-            if (label instanceof LocaleLabel locale) {
+            if (label instanceof final LocaleLabel locale) {
                 return new JLabel(locale.getKey());
-            } else if (label instanceof LiteralLabel literal) {
+            } else if (label instanceof final LiteralLabel literal) {
                 return fromLiteral(literal.getLiteral());
             } else {
                 throw new SerializationException("Unsupported label type: " + label.getClass().getName());
@@ -83,7 +83,7 @@ public interface SwingComponentSerializer extends LiteralFormatSerializer<JCompo
     @Override
     default @NonNull Label deserialize(final @NonNull JComponent serialized, final @NonNull LabelProvider provider) throws DeserializationException {
         try {
-            if (serialized instanceof JLabel jLabel) {
+            if (serialized instanceof final JLabel jLabel) {
                 return Label.of(provider, jLabel.getText());
             } else {
                 return Label.literal(provider, toLiteral(serialized));
@@ -119,8 +119,8 @@ public interface SwingComponentSerializer extends LiteralFormatSerializer<JCompo
          */
         @Override
         public @NonNull String toLiteral(@NonNull JComponent component) {
-            if (component instanceof JLabel label) return label.getText();
-            if (component instanceof JTextComponent text) return text.getText();
+            if (component instanceof final JLabel label) return label.getText();
+            if (component instanceof final JTextComponent text) return text.getText();
             return "";
         }
 
@@ -161,8 +161,8 @@ public interface SwingComponentSerializer extends LiteralFormatSerializer<JCompo
          */
         @Override
         public @NonNull String toLiteral(@NonNull JComponent component) {
-            if (component instanceof JTextComponent text) return text.getText();
-            if (component instanceof JLabel label) return label.getText();
+            if (component instanceof final JTextComponent text) return text.getText();
+            if (component instanceof final JLabel label) return label.getText();
             return "";
         }
 
@@ -202,8 +202,8 @@ public interface SwingComponentSerializer extends LiteralFormatSerializer<JCompo
          */
         @Override
         public @NonNull String toLiteral(@NonNull JComponent component) {
-            if (component instanceof AbstractButton button) return button.getText();
-            if (component instanceof JLabel label) return label.getText();
+            if (component instanceof final AbstractButton button) return button.getText();
+            if (component instanceof final JLabel label) return label.getText();
             return "";
         }
 

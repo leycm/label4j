@@ -56,9 +56,9 @@ public interface AwtComponentSerializer extends LiteralFormatSerializer<Componen
     @Override
     default @NonNull Component serialize(final @NonNull Label label) throws SerializationException {
         try {
-            if (label instanceof LocaleLabel locale) {
+            if (label instanceof final LocaleLabel locale) {
                 return new java.awt.Label(locale.getKey());
-            } else if (label instanceof LiteralLabel literal) {
+            } else if (label instanceof final LiteralLabel literal) {
                 return fromLiteral(literal.getLiteral());
             } else {
                 throw new SerializationException("Unsupported label type: " + label.getClass().getName());
@@ -84,7 +84,7 @@ public interface AwtComponentSerializer extends LiteralFormatSerializer<Componen
     @Override
     default @NonNull Label deserialize(final @NonNull Component serialized, final @NonNull LabelProvider provider) throws DeserializationException {
         try {
-            if (serialized instanceof java.awt.Label awtLabel) {
+            if (serialized instanceof final java.awt.Label awtLabel) {
                 return Label.of(provider, awtLabel.getText());
             } else {
                 return Label.literal(provider, toLiteral(serialized));
@@ -119,7 +119,7 @@ public interface AwtComponentSerializer extends LiteralFormatSerializer<Componen
          */
         @Override
         public @NonNull String toLiteral(@NonNull Component component) {
-            if (component instanceof java.awt.Label label) {
+            if (component instanceof final java.awt.Label label) {
                 return label.getText();
             }
             return component.getName();
@@ -161,7 +161,7 @@ public interface AwtComponentSerializer extends LiteralFormatSerializer<Componen
          */
         @Override
         public @NonNull String toLiteral(@NonNull Component component) {
-            if (component instanceof TextComponent textComponent) {
+            if (component instanceof final TextComponent textComponent) {
                 return textComponent.getText();
             }
             return component.getName();
