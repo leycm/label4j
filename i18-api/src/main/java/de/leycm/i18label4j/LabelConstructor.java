@@ -68,6 +68,12 @@ public final class LabelConstructor<O> implements Mappable<LabelConstructor<O>> 
     /** {@inheritDoc} */
     @Override
     public @NonNull LabelConstructor<O> map(final @NonNull Mapping mapping) throws IllegalArgumentException {
+        if (mappings.contains(mapping))
+            throw new IllegalArgumentException(
+                    "Mapping with key \"" + mapping.key() + "\" already exists for this LabelConstructor.");
+        if (objectResolvers.containsKey(mapping.key()))
+            throw new IllegalArgumentException(
+                    "Mapping with key \"" + mapping.key() + "\" already exists as  for this LabelConstructor.");
          mappings.add(mapping);
          return this;
     }
@@ -82,11 +88,20 @@ public final class LabelConstructor<O> implements Mappable<LabelConstructor<O>> 
      * @param function the function evaluated at mapping time;
      *                 never {@code null}
      * @return this instance for method chaining; never {@code null}
+     * @throws IllegalArgumentException if a mapping with the same key
+     *                                  already exists on this label
      * @throws NullPointerException     if {@code key} or {@code function}
      *                                  is {@code null}
      */
     public @NonNull LabelConstructor<O> map(final @NonNull String key,
                                             final @NonNull Function<O, Object> function) throws IllegalArgumentException {
+        // note: using a dummy mapping to check for existing keys in the mappings set, since it is keyed by the mapping's key
+        if (mappings.contains(new Mapping(key, () -> null)))
+            throw new IllegalArgumentException(
+                    "Mapping with key \"" + key + "\" already exists for this LabelConstructor.");
+        if (objectResolvers.containsKey(key))
+            throw new IllegalArgumentException(
+                    "Mapping with key \"" + key + "\" already exists for this LabelConstructor.");
         objectResolvers.put(key, function);
         return this;
     }

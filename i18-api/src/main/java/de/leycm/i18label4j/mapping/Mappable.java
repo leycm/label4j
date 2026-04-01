@@ -42,6 +42,8 @@ public interface Mappable<T> {
      * @param key   the placeholder key; never {@code null}
      * @param value the static replacement value; never {@code null}
      * @return this instance for method chaining; never {@code null}
+     * @throws IllegalArgumentException if a mapping with the same key
+     *                                  already exists on this label
      * @throws NullPointerException     if {@code key} or {@code value}
      *                                  is {@code null}
      */
@@ -60,6 +62,8 @@ public interface Mappable<T> {
      * @param supplier the value supplier evaluated at mapping time;
      *                 never {@code null}
      * @return this instance for method chaining; never {@code null}
+     * @throws IllegalArgumentException if a mapping with the same key
+     *                                  already exists on this label
      * @throws NullPointerException     if {@code key} or {@code supplier}
      *                                  is {@code null}
      */
@@ -77,6 +81,8 @@ public interface Mappable<T> {
      *
      * @param mapping the mapping to register; never {@code null}
      * @return this instance for method chaining; never {@code null}
+     * @throws IllegalArgumentException if a mapping with the same key
+     *                                  already exists on this label
      * @throws NullPointerException     if {@code mapping} is {@code null}
      */
     @NonNull T map(@NonNull Mapping mapping) throws IllegalArgumentException;
