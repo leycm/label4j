@@ -14,7 +14,7 @@
 
   <p align="center">
     A simple and lightweight registry library with flexible identifiers and namespaces for Java.<br/>
-    Localize your application cleanly — with typed labels, dynamic placeholders, and pluggable serializers.
+    Localize your application cleanly with typed labels, dynamic placeholders, and pluggable serializers.
     <br />
     <br />
     <a href="https://github.com/leycm/i18label4j"><strong>Explore the docs »</strong></a>
