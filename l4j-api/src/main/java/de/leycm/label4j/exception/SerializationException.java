@@ -1,12 +1,20 @@
 /*
- * This file is part of the i18label4j Library.
+ * Copyright (C) 2026 leycm <leycm@proton.me>
  *
- * Licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0)
- * You should have received a copy of the license in LICENSE.LGPL
- * If not, see https://www.gnu.org/licenses/lgpl-3.0.txt
+ * This file is part of label4j.
  *
- * Copyright 2026 (c) leycm <leycm@proton.me>
- * Copyright 2026 (c) maintainers
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 package de.leycm.label4j.exception;
 
