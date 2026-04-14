@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public record Localization(
@@ -126,4 +127,28 @@ public record Localization(
         return result;
     }
 
+    @Override
+    public @NonNull String toString() {
+        return "Localization{" +
+                "key='" + key + '\'' +
+                ", origin=" + origin +
+                ", request=" + request +
+                ", result='" + result + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        Localization that = (Localization) object;
+        return Objects.equals(key, that.key)
+                && Objects.equals(origin, that.origin)
+                && Objects.equals(result, that.result)
+                && Objects.equals(request, that.request);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key, origin, request, result);
+    }
 }

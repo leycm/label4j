@@ -51,9 +51,17 @@ public record Placeholder(
         return String.valueOf(value.get());
     }
 
+    public @NonNull String toString(final @NonNull PlaceholderRule rule) {
+        return rule.prefix() + key + rule.suffix().orElse("");
+    }
+
     @Override
-    public int compareTo(final @NonNull Placeholder other) {
-        return this.key.compareTo(other.key);
+    public @NonNull String toString() {
+        if (!Instanceable.hasInstance(LabelProvider.class)) {
+            return toString(PlaceholderRule.DOLLAR_CURLY);
+        }
+        // todo: replace with return toString(LabelProvider.getInstance().getPlaceholderRule());
+        return "";
     }
 
     @Override
@@ -63,21 +71,14 @@ public record Placeholder(
         return Objects.equals(key, that.key);
     }
 
+
     @Override
     public int hashCode() {
         return Objects.hashCode(key);
     }
 
     @Override
-    public @NonNull String toString() {
-        if (!Instanceable.hasInstance(LabelProvider.class)) {
-            return toString(PlaceholderRule.DOLLAR_CURLY);
-        }
-        // todo: replace with return toString(LabelProvider.getInstance().placeholderRule());
-        return "";
-    }
-
-    public @NonNull String toString(final @NonNull PlaceholderRule rule) {
-        return rule.prefix() + key + rule.suffix().orElse("");
+    public int compareTo(final @NonNull Placeholder other) {
+        return this.key.compareTo(other.key);
     }
 }

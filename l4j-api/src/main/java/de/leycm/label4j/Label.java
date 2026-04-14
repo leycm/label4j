@@ -50,10 +50,15 @@ public interface Label {
 
     @NonNull String resolve();
 
-    int hashCode();
 
-    boolean equals(@NonNull Label label);
-
+    @Override
     @NonNull String toString();
+
+    @Override
+    boolean equals(Object obj);
+
+
+    @Override
+    int hashCode();
 
 }
