@@ -41,7 +41,7 @@ public record Localization(
     }
 
     @ApiStatus.Internal
-    public static @NonNull Localization ofNull(
+    public static @NonNull Localization empty(
             @NonNull String key,
             @NonNull Locale locale
     ) {
