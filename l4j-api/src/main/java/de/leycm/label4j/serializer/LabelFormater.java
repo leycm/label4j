@@ -1,6 +1,6 @@
 package de.leycm.label4j.serializer;
 
-import de.leycm.label4j.excaption.FormatException;
+import de.leycm.label4j.exception.FormatException;
 
 import lombok.NonNull;
 

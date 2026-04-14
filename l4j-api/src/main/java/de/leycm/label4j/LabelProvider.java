@@ -1,7 +1,7 @@
 package de.leycm.label4j;
 
 import de.leycm.init4j.instance.Instanceable;
-import de.leycm.label4j.excaption.*;
+import de.leycm.label4j.exception.*;
 import de.leycm.label4j.placeholder.PlaceholderRule;
 
 import lombok.NonNull;

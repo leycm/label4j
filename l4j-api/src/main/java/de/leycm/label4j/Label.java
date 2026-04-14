@@ -1,6 +1,6 @@
 package de.leycm.label4j;
 
-import de.leycm.label4j.excaption.DuplicatePlaceholderException;
+import de.leycm.label4j.exception.DuplicatePlaceholderException;
 import de.leycm.label4j.placeholder.Placeholder;
 
 import lombok.NonNull;

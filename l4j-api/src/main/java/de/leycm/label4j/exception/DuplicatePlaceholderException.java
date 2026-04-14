@@ -8,7 +8,7 @@
  * Copyright 2026 (c) leycm <leycm@proton.me>
  * Copyright 2026 (c) maintainers
  */
-package de.leycm.label4j.excaption;
+package de.leycm.label4j.exception;
 
 import lombok.NonNull;
 

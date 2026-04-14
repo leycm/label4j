@@ -1,7 +1,7 @@
 package de.leycm.label4j.serializer;
 
 import de.leycm.label4j.Label;
-import de.leycm.label4j.excaption.SerializationException;
+import de.leycm.label4j.exception.SerializationException;
 
 import lombok.NonNull;
 
