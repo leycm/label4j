@@ -82,6 +82,8 @@ public record Localization(
         return result;
     }
 
+    // ==== State Methods ====================================================
+
     public boolean isFulfilled() {
         return origin.equals(request);
     }
@@ -94,11 +96,15 @@ public record Localization(
         return !isEmpty();
     }
 
+    // ==== Convert and Filter Methods ========================================
+
     public @NonNull Localization toFulfilled() {
         if (isFulfilled()) return this;
         // note: result will be striped if it came from an other origin
         return new Localization(key, request, request, null);
     }
+
+    // ==== Getters ===========================================================
 
     public @NonNull String get() {
         return orElseThrow();
