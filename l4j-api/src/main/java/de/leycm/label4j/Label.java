@@ -36,8 +36,7 @@ public interface Label {
 
     @NonNull LabelProvider getProvider();
 
-    @UnmodifiableView
-    @NonNull Set<Placeholder> getPlaceholders();
+    @UnmodifiableView @NonNull Set<Placeholder> getPlaceholders();
 
     // ==== Replacement Methods ===============================================
 
@@ -55,11 +54,16 @@ public interface Label {
         return replace(new Placeholder(key, supplier));
     }
 
-    @NonNull Label replace(@NonNull Placeholder @NonNull ... placeholders)
+    default @NonNull Label replace(
+            @NonNull Placeholder @NonNull ... placeholders
+    ) throws DuplicatePlaceholderException {
+        return replace(Set.of(placeholders));
+    }
+
+    @NonNull Label replace(@NonNull Set<@NonNull Placeholder> placeholders)
             throws DuplicatePlaceholderException;
 
     // ==== Resolution Methods ================================================
-    // todo: add fallback handling to LabelProvider
 
     default @NonNull <T> T resolveDefault(final @NonNull Class<T> type) {
         return resolve(getProvider().getDefaultLocale(), type);

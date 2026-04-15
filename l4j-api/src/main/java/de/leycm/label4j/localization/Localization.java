@@ -47,6 +47,14 @@ public record Localization(
         return new Localization(key, locale, locale, null);
     }
 
+    @ApiStatus.Internal
+    public static @NonNull Localization literal(
+            @NonNull Locale locale,
+            @NonNull String result
+    ) {
+        return new Localization(LITERAL_KEY, locale, locale, result);
+    }
+
     public static @NonNull Localization of(
             @NonNull String key,
             @NonNull Locale locale,
@@ -66,6 +74,7 @@ public record Localization(
 
     // ==== Localization Validation ===========================================
 
+    @ApiStatus.Internal
     public Localization {
         if (result != null && result.isBlank()) {
             throw new IllegalArgumentException("The result of a Localization cannot be blank");
@@ -124,7 +133,9 @@ public record Localization(
         return result;
     }
 
-    public @NonNull String orElseGet(final @NonNull Supplier<@NonNull String> supplier) {
+    public @NonNull String orElseGet(
+            final @NonNull Supplier<@NonNull String> supplier
+    ) {
         if (isEmpty()) return supplier.get();
         return result;
     }

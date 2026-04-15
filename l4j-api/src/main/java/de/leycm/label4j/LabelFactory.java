@@ -19,6 +19,8 @@
 package de.leycm.label4j;
 
 import de.leycm.label4j.exception.DuplicatePlaceholderException;
+import de.leycm.label4j.label.LiteralLabel;
+import de.leycm.label4j.label.LocaleLabel;
 import de.leycm.label4j.placeholder.Placeholder;
 
 import lombok.NonNull;
@@ -32,14 +34,14 @@ import java.util.function.Supplier;
 
 public class LabelFactory<T> {
     private final @NonNull Map<String, Function<T, @Nullable Object>> objectResolvers;
-    private final @NonNull Set<Placeholder> voidResolvers;
+    private final @NonNull Set<Placeholder> resolvers;
 
     private final @NonNull LabelProvider provider;
 
     @ApiStatus.Internal
     LabelFactory(final @NonNull LabelProvider provider) {
         this.objectResolvers = new ConcurrentHashMap<>();
-        this.voidResolvers = ConcurrentHashMap.newKeySet();
+        this.resolvers = ConcurrentHashMap.newKeySet();
         this.provider = provider;
     }
 
@@ -67,7 +69,7 @@ public class LabelFactory<T> {
             final @NonNull String key,
             final @NonNull Function<T, @Nullable Object> function
     ) throws DuplicatePlaceholderException {
-        if(this.voidResolvers.contains(new Placeholder(key, () -> null))
+        if(this.resolvers.contains(new Placeholder(key, () -> null))
                 || this.objectResolvers.containsKey(key)) {
             throw new DuplicatePlaceholderException(key);
         }
@@ -81,22 +83,34 @@ public class LabelFactory<T> {
     ) throws DuplicatePlaceholderException {
 
         for (final Placeholder placeholder : placeholders) {
-            if(this.voidResolvers.contains(placeholder)
+            if(this.resolvers.contains(placeholder)
                     || this.objectResolvers.containsKey(placeholder.key())) {
                 throw new DuplicatePlaceholderException(placeholder.key());
             }
-            this.voidResolvers.add(placeholder);
+            this.resolvers.add(placeholder);
         }
 
         return this;
     }
 
     public @NonNull Label create(String key, T t) {
-        return null;
+        return applyPlaceholder(new LocaleLabel(key, provider), t);
     }
 
     public @NonNull Label createLiteral(String literal, T t) {
-        return null;
+        return applyPlaceholder(new LiteralLabel(literal, provider), t);
     }
 
+
+    private @NonNull Label applyPlaceholder(
+            final @NonNull Label label,
+            final @NonNull T t
+    ) {
+        label.replace(resolvers);
+
+        for (final Map.Entry<String, Function<T, @Nullable Object>> entry : objectResolvers.entrySet()) {
+            label.replace(entry.getKey(), () -> entry.getValue().apply(t));
+        }
+        return label;
+    }
 }
