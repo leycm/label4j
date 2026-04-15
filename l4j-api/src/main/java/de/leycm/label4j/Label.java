@@ -23,6 +23,7 @@ import de.leycm.label4j.localization.Localization;
 import de.leycm.label4j.placeholder.Placeholder;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Locale;
@@ -49,12 +50,12 @@ public interface Label {
 
     default @NonNull Label replace(
             final @NonNull String key,
-            final @NonNull Supplier<Object> supplier
+            final @NonNull Supplier<@Nullable Object> supplier
     ) throws DuplicatePlaceholderException {
         return replace(new Placeholder(key, supplier));
     }
 
-    @NonNull Label replace(@NonNull Placeholder mapping)
+    @NonNull Label replace(@NonNull Placeholder @NonNull ... placeholders)
             throws DuplicatePlaceholderException;
 
     // ==== Resolution Methods ================================================
