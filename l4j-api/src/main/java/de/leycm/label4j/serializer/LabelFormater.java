@@ -25,10 +25,5 @@ import lombok.NonNull;
 
 @FunctionalInterface
 public interface LabelFormater<T> {
-
-    default @NonNull T format(@NonNull Localization input) throws FormatException {
-        return format(input.get());
-    }
-
     @NonNull T format(@NonNull String input) throws FormatException;
 }

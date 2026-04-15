@@ -25,6 +25,5 @@ import lombok.NonNull;
 
 @FunctionalInterface
 public interface LabelSerializer<T> {
-
     @NonNull T serialize(@NonNull Label label) throws SerializationException;
 }
