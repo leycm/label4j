@@ -19,11 +19,13 @@
 package de.leycm.label4j;
 
 import de.leycm.label4j.exception.DuplicatePlaceholderException;
+import de.leycm.label4j.localization.Localization;
 import de.leycm.label4j.placeholder.Placeholder;
 
 import lombok.NonNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -52,23 +54,38 @@ public interface Label {
         return replace(new Placeholder(key, supplier));
     }
 
-    @NonNull Label replace(@NonNull Placeholder mapping) throws DuplicatePlaceholderException;
+    @NonNull Label replace(@NonNull Placeholder mapping)
+            throws DuplicatePlaceholderException;
 
     // ==== Resolution Methods ================================================
+    // todo: add fallback handling to LabelProvider
 
-    default @NonNull <T> T resolve(final @NonNull Class<T> type) {
-        return getProvider().format(resolve(), type);
+    default @NonNull <T> T resolveDefault(final @NonNull Class<T> type) {
+        return getProvider().format(resolveDefault(), type);
     }
 
-    default @NonNull String resolve() {
-        return getProvider().getPlaceholderRule().apply(value(), getPlaceholders());
+    default @NonNull String resolveDefault() {
+        final Localization localization = localizeDefault();
+        return getProvider().getPlaceholderRule()
+                .apply(localization.orElse(""),
+                        getPlaceholders());
     }
 
-    default @NonNull <T> T value(final @NonNull Class<T> type) {
-        return getProvider().format(value(), type);
+    default @NonNull <T> T resolve(
+            final @NonNull Locale locale,
+            final @NonNull Class<T> type) {
+        return getProvider().format(resolve(locale), type);
     }
 
-    @NonNull String value();
+    default @NonNull String resolve(final  @NonNull Locale locale) {
+        final Localization localization = localize(locale);
+        return getProvider().getPlaceholderRule()
+                .apply(localization.orElse(""), getPlaceholders());
+    }
+
+    @NonNull Localization localizeDefault();
+
+    @NonNull Localization localize(@NonNull Locale locale);
 
     // ==== Object Methods ====================================================
 
@@ -77,7 +94,6 @@ public interface Label {
 
     @Override
     boolean equals(Object obj);
-
 
     @Override
     int hashCode();
