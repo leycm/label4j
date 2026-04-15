@@ -61,29 +61,28 @@ public interface Label {
     // todo: add fallback handling to LabelProvider
 
     default @NonNull <T> T resolveDefault(final @NonNull Class<T> type) {
-        return getProvider().format(resolveDefault(), type);
+        return resolve(getProvider().getDefaultLocale(), type);
     }
 
     default @NonNull String resolveDefault() {
-        final Localization localization = localizeDefault();
-        return getProvider().getPlaceholderRule()
-                .apply(localization.orElse(""),
-                        getPlaceholders());
+        return resolve(getProvider().getDefaultLocale());
     }
 
-    default @NonNull <T> T resolve(
-            final @NonNull Locale locale,
-            final @NonNull Class<T> type) {
+    default @NonNull Localization localizeDefault() {
+        return localize(getProvider().getDefaultLocale());
+    }
+
+    default @NonNull <T> T resolve(final @NonNull Locale locale,
+                                   final @NonNull Class<T> type) {
         return getProvider().format(resolve(locale), type);
     }
 
-    default @NonNull String resolve(final  @NonNull Locale locale) {
-        final Localization localization = localize(locale);
-        return getProvider().getPlaceholderRule()
-                .apply(localization.orElse(""), getPlaceholders());
-    }
+    default @NonNull String resolve(final @NonNull Locale locale) {
+        final String result = getProvider().resolveLiteral(localize(locale));
 
-    @NonNull Localization localizeDefault();
+        return getProvider().getPlaceholderRule()
+                .apply(result, getPlaceholders());
+    }
 
     @NonNull Localization localize(@NonNull Locale locale);
 

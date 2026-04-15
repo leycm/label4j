@@ -20,9 +20,12 @@ package de.leycm.label4j;
 
 import de.leycm.init4j.instance.Instanceable;
 import de.leycm.label4j.exception.*;
+import de.leycm.label4j.localization.Localization;
 import de.leycm.label4j.placeholder.PlaceholderRule;
 
 import lombok.NonNull;
+
+import java.util.Locale;
 
 public interface LabelProvider extends Instanceable {
 
@@ -30,18 +33,39 @@ public interface LabelProvider extends Instanceable {
         return Instanceable.getInstance(LabelProvider.class);
     }
 
+    // ==== Configuration ====================================================
+
     @NonNull PlaceholderRule getPlaceholderRule();
+
+    @NonNull Locale getDefaultLocale();
+
+    // ==== Fallback Handling ================================================
+
+    String resolveLiteral(@NonNull Localization localization);
+
+    String handleFallback(@NonNull String key);
+
+    // ==== Localization =====================================================
+
+    void warmup(@NonNull Locale @NonNull ... locales);
+
+    @NonNull Localization localize(
+            @NonNull Locale locale,
+            @NonNull String key
+    );
 
     // ==== Serialization ====================================================
 
-    <T> @NonNull T serialize(@NonNull Label label,
-                             @NonNull Class<T> type)
-            throws SerializationException;
+    <T> @NonNull T serialize(
+            @NonNull Label label,
+            @NonNull Class<T> type
+    ) throws SerializationException;
 
     <T> @NonNull Label deserialize(@NonNull T serialized)
             throws DeserializationException;
 
-    <T> @NonNull T format(@NonNull String input,
-                          @NonNull Class<T> type)
-            throws FormatException;
+    <T> @NonNull T format(
+            @NonNull String input,
+            @NonNull Class<T> type
+    ) throws FormatException;
 }
