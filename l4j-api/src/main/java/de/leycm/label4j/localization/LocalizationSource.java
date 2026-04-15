@@ -16,14 +16,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package de.leycm.label4j.serializer;
-
-import de.leycm.label4j.Label;
-import de.leycm.label4j.exception.SerializationException;
+package de.leycm.label4j.localization;
 
 import lombok.NonNull;
 
-@FunctionalInterface
-public interface LabelSerializer<T> {
-    @NonNull T serialize(@NonNull Label label) throws SerializationException;
+import java.util.Locale;
+import java.util.Set;
+
+public interface LocalizationSource {
+    // note: this can return an empty set even if there are localization
+    @NonNull Set<Locale> getLocalizations();
+
+    // note: this can throw an exception if the localization is not found
+    @NonNull Localization getLocalization(@NonNull Locale locale) throws Exception;
+
+    // note: logic can be replaced with a more accurate implementation
+    default boolean containsLocalization(@NonNull Locale locale) {
+        return getLocalizations().contains(locale);
+    }
+
 }

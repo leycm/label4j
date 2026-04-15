@@ -34,6 +34,9 @@ public record Localization(
         @Nullable String result
 )  {
 
+    public static final @NonNull String WARMUP_KEY = "__warmup__";
+    public static final @NonNull String LITERAL_KEY = "__literal__";
+
     // ==== Static Factory Methods ============================================
 
     @ApiStatus.Internal
