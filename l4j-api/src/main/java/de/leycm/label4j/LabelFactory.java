@@ -93,14 +93,21 @@ public class LabelFactory<T> {
         return this;
     }
 
-    public @NonNull Label create(String key, T t) {
+    // ==== Creation Methods ==================================================
+
+    public @NonNull Label create(
+            final @NonNull String key,
+            final @NonNull T t
+    ) {
         return applyPlaceholder(new LocaleLabel(key, provider), t);
     }
 
-    public @NonNull Label createLiteral(String literal, T t) {
+    public @NonNull Label createLiteral(
+            final @NonNull String literal,
+            final @NonNull T t
+    ) {
         return applyPlaceholder(new LiteralLabel(literal, provider), t);
     }
-
 
     private @NonNull Label applyPlaceholder(
             final @NonNull Label label,
@@ -108,9 +115,11 @@ public class LabelFactory<T> {
     ) {
         label.replace(resolvers);
 
-        for (final Map.Entry<String, Function<T, @Nullable Object>> entry : objectResolvers.entrySet()) {
+        for (final Map.Entry<String, Function<T, @Nullable Object>> entry :
+                objectResolvers.entrySet()) {
             label.replace(entry.getKey(), () -> entry.getValue().apply(t));
         }
+
         return label;
     }
 }
