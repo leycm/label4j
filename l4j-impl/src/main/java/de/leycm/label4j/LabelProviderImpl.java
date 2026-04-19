@@ -178,8 +178,8 @@ public class LabelProviderImpl implements LabelProvider {
     @Override
     public @NonNull <T> T serialize(
             final @NonNull Label label,
-            final @NonNull Class<T> type)
-            throws SerializationException {
+            final @NonNull Class<T> type
+    ) throws SerializationException {
 
         final LabelSerializer<?> serializer = serializerRegistry.get(type);
         if (serializer == null)
@@ -192,8 +192,9 @@ public class LabelProviderImpl implements LabelProvider {
     }
 
     @Override
-    public @NonNull <T> Label deserialize(final @NonNull T serialized)
-            throws DeserializationException {
+    public @NonNull <T> Label deserialize(
+            final @NonNull T serialized
+    ) throws DeserializationException {
 
         final Class<?> type = serialized.getClass();
         final LabelSerializer<T> serializer = getSafeSerializer(type);
@@ -218,8 +219,8 @@ public class LabelProviderImpl implements LabelProvider {
     @Override
     public @NonNull <T> T format(
             final @NonNull String input,
-            final @NonNull Class<T> type)
-            throws FormatException {
+            final @NonNull Class<T> type
+    ) throws FormatException {
 
         final LabelSerializer<?> serializer = serializerRegistry.get(type);
         if (serializer == null)
@@ -242,7 +243,9 @@ public class LabelProviderImpl implements LabelProvider {
     }
 
     @SuppressWarnings("unchecked") // cause: ClassCastException is caught explicitly
-    private <T> LabelSerializer<T> getSafeSerializer(final @NonNull Class<?> type) {
+    private <T> LabelSerializer<T> getSafeSerializer(
+            final @NonNull Class<?> type
+    ) {
         try {
             return (LabelSerializer<T>) serializerRegistry.get(type);
         } catch (final ClassCastException e) {
