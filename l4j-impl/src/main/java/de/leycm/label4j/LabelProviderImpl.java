@@ -26,12 +26,13 @@ import de.leycm.label4j.localization.Localization;
 import de.leycm.label4j.localization.LocalizationSource;
 import de.leycm.label4j.placeholder.PlaceholderRule;
 import de.leycm.label4j.serializer.LabelDeserializer;
-import de.leycm.label4j.serializer.LabelFormater;
+import de.leycm.label4j.serializer.LabelFormatter;
 import de.leycm.label4j.serializer.LabelSerializer;
 
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Map;
@@ -57,8 +58,14 @@ public class LabelProviderImpl implements LabelProvider {
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Localization>>
             translationCache = new ConcurrentHashMap<>();
     // target class -> serializer
-    private final ConcurrentHashMap<Class<?>, LabelSerializer<?>>
+    private final Map<Class<?>, LabelSerializer<?>>
             serializerRegistry = new ConcurrentHashMap<>();
+    // target class -> deserializer
+    private final Map<Class<?>, LabelDeserializer<?>>
+            deserializerRegistry = new ConcurrentHashMap<>();
+    // target class -> serializer
+    private final Map<Class<?>, LabelFormatter<?>>
+            formaterRegistry = new ConcurrentHashMap<>();
 
     private final @NonNull LocalizationSource localizationSource;
     private final @NonNull PlaceholderRule placeholderRule;
@@ -66,10 +73,14 @@ public class LabelProviderImpl implements LabelProvider {
 
     public LabelProviderImpl(
             final @NonNull Map<Class<?>, LabelSerializer<?>> serializers,
+            final @NonNull Map<Class<?>, LabelDeserializer<?>> deserializers,
+            final @NonNull Map<Class<?>, LabelFormatter<?>> formater,
             final @NonNull PlaceholderRule placeholderRule,
             final @NonNull LocalizationSource source,
             final @NonNull Locale defaultLocale) {
         this.serializerRegistry.putAll(serializers);
+        this.deserializerRegistry.putAll(deserializers);
+        this.formaterRegistry.putAll(formater);
         this.localizationSource = source;
         this.placeholderRule = placeholderRule;
         this.defaultLocale = defaultLocale;
@@ -181,14 +192,14 @@ public class LabelProviderImpl implements LabelProvider {
             final @NonNull Class<T> type
     ) throws SerializationException {
 
-        final LabelSerializer<?> serializer = serializerRegistry.get(type);
-        if (serializer == null)
+        final LabelSerializer<T> serializer = getConverterSafe(type, LabelSerializer.class, serializerRegistry);
+        if (serializer == null) {
             throw new IllegalArgumentException(
                     "No serializer registered for type: " + type.getName()
             );
+        }
 
-        final Object result = serializer.serialize(label);
-        return type.cast(result);
+        return type.cast(serializer.serialize(label));
     }
 
     @Override
@@ -197,23 +208,15 @@ public class LabelProviderImpl implements LabelProvider {
     ) throws DeserializationException {
 
         final Class<?> type = serialized.getClass();
-        final LabelSerializer<T> serializer = getSafeSerializer(type);
+        final LabelDeserializer<T> deserializer = getConverterSafe(type, LabelDeserializer.class, deserializerRegistry);
 
-        if (serializer == null)
+        if (deserializer == null) {
             throw new IllegalArgumentException(
-                    "No serializer registered for type: " + type.getName()
+                    "No deserializer registered for type: " + type.getName()
             );
-
-        if (serializer instanceof LabelDeserializer) {
-            @SuppressWarnings("unchecked")
-            final LabelDeserializer<T> deserializer = (LabelDeserializer<T>) serializer;
-            return deserializer.deserialize(serialized, this);
         }
 
-        throw new DeserializationException(serialized,
-                "Registered serializer for " + type.getName()
-                        + " does not implement LabelDeserializer"
-        );
+        return deserializer.deserialize(serialized, this);
     }
 
     @Override
@@ -222,34 +225,29 @@ public class LabelProviderImpl implements LabelProvider {
             final @NonNull Class<T> type
     ) throws FormatException {
 
-        final LabelSerializer<?> serializer = serializerRegistry.get(type);
-        if (serializer == null)
+        final LabelFormatter<T> formatter = getConverterSafe(type, LabelFormatter.class, formaterRegistry);
+        if (formatter == null) {
             throw new IllegalArgumentException(
-                    "No serializer registered for type: " + type.getName()
+                    "No formatter registered for type: " + type.getName()
             );
-
-        if (serializer instanceof LabelFormater) {
-            @SuppressWarnings("unchecked")
-            final LabelFormater<T> formatter = (LabelFormater<T>) serializer;
-            return formatter.format(input);
         }
 
-        throw new FormatException(input, type,
-                new UnsupportedOperationException(
-                        "Registered serializer for " + type.getName()
-                                + " does not implement LabelFormater"
-                )
-        );
+        return formatter.format(input);
     }
 
-    @SuppressWarnings("unchecked") // cause: ClassCastException is caught explicitly
-    private <T> LabelSerializer<T> getSafeSerializer(
-            final @NonNull Class<?> type
+    @SuppressWarnings("unchecked")
+    private <T> @Nullable T getConverterSafe(
+            final @NonNull Class<?> type,
+            final @NonNull Class<?> converterType,
+            final @NonNull Map<Class<?>, ?> registry
     ) {
-        try {
-            return (LabelSerializer<T>) serializerRegistry.get(type);
-        } catch (final ClassCastException e) {
-            throw new IncompatibleMatchException(type, e);
+        final Object converter = registry.get(type);
+        if (converter == null) return null;
+
+        if (!converterType.isInstance(converter)) {
+            throw new IncompatibleMatchException(type);
         }
+
+        return (T) converter;
     }
 }

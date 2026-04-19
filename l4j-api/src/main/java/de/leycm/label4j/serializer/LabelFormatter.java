@@ -19,11 +19,10 @@
 package de.leycm.label4j.serializer;
 
 import de.leycm.label4j.exception.FormatException;
-import de.leycm.label4j.localization.Localization;
 
 import lombok.NonNull;
 
 @FunctionalInterface
-public interface LabelFormater<T> {
+public interface LabelFormatter<T> {
     @NonNull T format(@NonNull String input) throws FormatException;
 }

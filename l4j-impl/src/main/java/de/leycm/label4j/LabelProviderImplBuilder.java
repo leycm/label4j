@@ -20,6 +20,9 @@ package de.leycm.label4j;
 
 import de.leycm.label4j.localization.LocalizationSource;
 import de.leycm.label4j.placeholder.PlaceholderRule;
+import de.leycm.label4j.serializer.LabelAdapter;
+import de.leycm.label4j.serializer.LabelDeserializer;
+import de.leycm.label4j.serializer.LabelFormatter;
 import de.leycm.label4j.serializer.LabelSerializer;
 
 import lombok.NonNull;
@@ -30,26 +33,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Fluent builder for {@link LabelProviderImpl}.
- *
- * <p>Typical usage:</p>
- * <pre>{@code
- * LabelProvider provider = LabelProviderImpl.builder()
- *     .locale(Locale.ENGLISH)
- *     .placeholderRule(PlaceholderRule.DOLLAR_CURLY)
- *     .withSerializer(String.class, myStringSerializer)
- *     .build(source);
- * }</pre>
- *
- * <p>All setter methods return {@code this} for chaining. Neither
- * {@link #build(LocalizationSource)} nor {@link #buildWarm(LocalizationSource, Locale...)}
- * mutates the builder, so the same builder instance can produce multiple
- * providers if needed.</p>
- *
- * @since 2.0
- * @see LabelProviderImpl
- */
 public class LabelProviderImplBuilder {
 
     // ==== Defaults ==========================================================
@@ -59,7 +42,9 @@ public class LabelProviderImplBuilder {
 
     // ==== Builder State =====================================================
 
-    private final @NonNull Map<Class<?>, LabelSerializer<?>> serializers = new HashMap<>();
+    private final @NonNull Map<Class<?>, LabelSerializer<?>>   serializers   = new HashMap<>();
+    private final @NonNull Map<Class<?>, LabelDeserializer<?>> deserializers = new HashMap<>();
+    private final @NonNull Map<Class<?>, LabelFormatter<?>>     formatters    = new HashMap<>();
 
     private @NonNull PlaceholderRule placeholderRule = DEFAULT_RULE;
     private @NonNull Locale          defaultLocale   = DEFAULT_LOCALE;
@@ -72,9 +57,6 @@ public class LabelProviderImplBuilder {
     /**
      * Sets the default {@link Locale} used when no locale is specified on a
      * resolution call.
-     *
-     * @param locale the default locale; never {@code null}
-     * @return {@code this} builder
      */
     @Contract("_ -> this")
     public @NonNull LabelProviderImplBuilder locale(final @NonNull Locale locale) {
@@ -85,9 +67,6 @@ public class LabelProviderImplBuilder {
     /**
      * Sets the {@link PlaceholderRule} used for placeholder substitution.
      * Defaults to {@link PlaceholderRule#DEFAULT} ({@code ${variable}}).
-     *
-     * @param rule the placeholder rule; never {@code null}
-     * @return {@code this} builder
      */
     @Contract("_ -> this")
     public @NonNull LabelProviderImplBuilder placeholderRule(
@@ -98,14 +77,6 @@ public class LabelProviderImplBuilder {
 
     /**
      * Registers a {@link LabelSerializer} for the given target type.
-     *
-     * <p>If a serializer for {@code type} is already registered it will be
-     * silently replaced.</p>
-     *
-     * @param <T>        the target type
-     * @param type       the class to register the serializer for; never {@code null}
-     * @param serializer the serializer; never {@code null}
-     * @return {@code this} builder
      */
     @Contract("_, _ -> this")
     public @NonNull <T> LabelProviderImplBuilder withSerializer(
@@ -117,9 +88,6 @@ public class LabelProviderImplBuilder {
 
     /**
      * Registers multiple serializers at once from an existing map.
-     *
-     * @param serializers map of type -> serializer entries; never {@code null}
-     * @return {@code this} builder
      */
     @Contract("_ -> this")
     public @NonNull LabelProviderImplBuilder withSerializers(
@@ -128,23 +96,85 @@ public class LabelProviderImplBuilder {
         return this;
     }
 
+    /**
+     * Registers a {@link LabelDeserializer} for the given target type.
+     */
+    @Contract("_, _ -> this")
+    public @NonNull <T> LabelProviderImplBuilder withDeserializer(
+            final @NonNull Class<T> type,
+            final @NonNull LabelDeserializer<T> deserializer) {
+        this.deserializers.put(type, deserializer);
+        return this;
+    }
+
+    /**
+     * Registers multiple deserializers at once from an existing map.
+     */
+    @Contract("_ -> this")
+    public @NonNull LabelProviderImplBuilder withDeserializers(
+            final @NonNull Map<Class<?>, LabelDeserializer<?>> deserializers) {
+        this.deserializers.putAll(deserializers);
+        return this;
+    }
+
+    /**
+     * Registers a {@link LabelFormatter} for the given target type.
+     */
+    @Contract("_, _ -> this")
+    public @NonNull <T> LabelProviderImplBuilder withFormatter(
+            final @NonNull Class<T> type,
+            final @NonNull LabelFormatter<T> formater) {
+        this.formatters.put(type, formater);
+        return this;
+    }
+
+    /**
+     * Registers multiple formatters at once from an existing map.
+     */
+    @Contract("_ -> this")
+    public @NonNull LabelProviderImplBuilder withFormatters(
+            final @NonNull Map<Class<?>, LabelFormatter<?>> formatters) {
+        this.formatters.putAll(formatters);
+        return this;
+    }
+
+    /**
+     * Registers a {@link LabelAdapter} for the given target type.
+     * Convenience method that registers the adapter as both serializer
+     * and deserializer at once.
+     */
+    @Contract("_, _ -> this")
+    public @NonNull <T> LabelProviderImplBuilder withAdapter(
+            final @NonNull Class<T> type,
+            final @NonNull LabelAdapter<T> adapter) {
+        this.serializers.put(type, adapter);
+        this.deserializers.put(type, adapter);
+        return this;
+    }
+
+    /**
+     * Registers multiple adapters at once.
+     */
+    @Contract("_ -> this")
+    public @NonNull <T> LabelProviderImplBuilder withAdapters(
+            final @NonNull Map<Class<?>, LabelAdapter<?>> adapters) {
+        this.serializers.putAll(adapters);
+        this.deserializers.putAll(adapters);
+        return this;
+    }
+
     // ==== Build Methods =====================================================
 
     /**
      * Constructs a new {@link LabelProviderImpl} with the configured settings
      * and the given {@link LocalizationSource}.
-     *
-     * <p>The translation cache starts empty; locales are loaded lazily on
-     * first access.</p>
-     *
-     * @param source the localization source; never {@code null}
-     * @return a new {@link LabelProviderImpl}; never {@code null}
-     * @throws NullPointerException if {@code source} is {@code null}
      */
     @Contract("_ -> new")
     public @NonNull LabelProviderImpl build(final @NonNull LocalizationSource source) {
         return new LabelProviderImpl(
                 new ConcurrentHashMap<>(serializers),
+                new ConcurrentHashMap<>(deserializers),
+                new ConcurrentHashMap<>(formatters),
                 placeholderRule,
                 source,
                 defaultLocale
@@ -154,15 +184,6 @@ public class LabelProviderImplBuilder {
     /**
      * Constructs a new {@link LabelProviderImpl} and immediately warms the
      * translation cache for the given locales.
-     *
-     * <p>This is equivalent to calling {@link #build(LocalizationSource)}
-     * followed by {@link LabelProviderImpl#warmup(Locale...)}.</p>
-     *
-     * @param source  the localization source; never {@code null}
-     * @param locales the locales to preload; never {@code null},
-     *                individual elements never {@code null}
-     * @return a new, warmed {@link LabelProviderImpl}; never {@code null}
-     * @throws NullPointerException if {@code source} or any locale is {@code null}
      */
     @Contract("_, _ -> new")
     public @NonNull LabelProviderImpl buildWarm(
