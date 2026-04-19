@@ -39,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class LabelProviderImpl implements LabelProvider {
 
@@ -242,7 +241,7 @@ public class LabelProviderImpl implements LabelProvider {
         );
     }
 
-    @SuppressWarnings("unchecked") // ClassCastException is caught explicitly
+    @SuppressWarnings("unchecked") // cause: ClassCastException is caught explicitly
     private <T> LabelSerializer<T> getSafeSerializer(final @NonNull Class<?> type) {
         try {
             return (LabelSerializer<T>) serializerRegistry.get(type);
