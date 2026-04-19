@@ -21,6 +21,7 @@ package de.leycm.label4j;
 import de.leycm.init4j.instance.Instanceable;
 import de.leycm.label4j.exception.*;
 import de.leycm.label4j.localization.Localization;
+import de.leycm.label4j.localization.LocalizationSource;
 import de.leycm.label4j.placeholder.PlaceholderRule;
 
 import lombok.NonNull;
@@ -34,6 +35,8 @@ public interface LabelProvider extends Instanceable {
     }
 
     // ==== Configuration ====================================================
+
+    @NonNull LocalizationSource getLocalizationSource();
 
     @NonNull PlaceholderRule getPlaceholderRule();
 

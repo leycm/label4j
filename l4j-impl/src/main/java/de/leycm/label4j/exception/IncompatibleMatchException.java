@@ -16,25 +16,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package de.leycm.label4j.localization;
+package de.leycm.label4j.exception;
 
 import lombok.NonNull;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+public class IncompatibleMatchException extends ClassCastException {
 
-public interface LocalizationSource {
-    // note: this can return an empty set even if there are localization
-    @NonNull Set<Locale> getLocalizations();
-
-    // note: this can throw an exception if the localization is not found
-    @NonNull
-    Map<String, Localization> getLocalization(@NonNull Locale locale) throws Exception;
-
-    // note: logic can be replaced with a more accurate implementation
-    default boolean containsLocalization(@NonNull Locale locale) {
-        return getLocalizations().contains(locale);
+    public IncompatibleMatchException(final @NonNull String message) {
+        super(message);
     }
 
+    public IncompatibleMatchException(final @NonNull Class<?> type) {
+        super("Serializer for type " + type.getName() + " returned incompatible type");
+    }
+
+    public IncompatibleMatchException(final @NonNull Class<?> type,
+                                      final @NonNull Throwable cause) {
+        super(String.format("Serializer for type " + type.getName()
+                + " returned incompatible type: %s", cause.getMessage()));
+    }
 }
