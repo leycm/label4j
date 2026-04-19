@@ -42,7 +42,7 @@ dependencyResolutionManagement {
 rootProject.name = getGradleProperty("artifact") ?: "null"
 var prefix = (getGradleProperty("prefix") ?: "sub") + "-"
 
-include("api", "core")
+include("api", "impl")
 
 project(":api").projectDir = file("${prefix}api")
-project(":core").projectDir = file("${prefix}core")
+project(":impl").projectDir = file("${prefix}impl")
