@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 public class SingleFileSource implements LocalizationSource{
 
+    // the path to read the files from
     private final @NonNull Path directory;
     // the parser for reading translation files
     private final @NonNull FileParser parser;

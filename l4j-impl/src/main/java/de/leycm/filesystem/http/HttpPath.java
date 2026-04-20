@@ -236,7 +236,8 @@ public final class HttpPath implements Path {
 
     @Override
     public @NonNull String toString() {
-        return path;
+        if (path.equals("/")) return fs.getBaseUri().toString();
+        return fs.getBaseUri() + path;
     }
 
     @Override

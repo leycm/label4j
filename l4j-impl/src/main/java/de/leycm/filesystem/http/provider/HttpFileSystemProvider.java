@@ -27,18 +27,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HttpFileSystemProvider extends FileSystemProvider {
     private final @NonNull Map<URI, HttpFileSystem> fileSystems = new ConcurrentHashMap<>();
-    private final @NonNull String scheme; // htfp / htfps
-    private final @NonNull String type; // http / https
+    private final @NonNull String scheme; // http / https
 
     public HttpFileSystemProvider() {
         // called via META-INF/services/java.nio.file.spi.FileSystemProvider
-        this.scheme = "htfp";
-        this.type = "http";
+        this.scheme = "hftp";
     }
 
-    public HttpFileSystemProvider(@NonNull String scheme, @NonNull String type) {
+    public HttpFileSystemProvider(@NonNull String scheme) {
         this.scheme = scheme;
-        this.type = type;
     }
 
     @Override
@@ -70,7 +67,7 @@ public class HttpFileSystemProvider extends FileSystemProvider {
     public @NonNull Path getPath(final @NonNull URI uri) {
         final URI withoutScheme;
         try {
-            withoutScheme = new URI(type, uri.getUserInfo(), uri.getHost(), uri.getPort(),
+            withoutScheme = new URI(scheme, uri.getUserInfo(), uri.getHost(), uri.getPort(),
                     uri.getPath(), uri.getQuery(), uri.getFragment());
         } catch (final URISyntaxException e) {
             throw new IllegalArgumentException(e);
@@ -100,7 +97,7 @@ public class HttpFileSystemProvider extends FileSystemProvider {
                 throw new NoSuchFileException(path.toString());
             }
             if (statusCode != 200) {
-                throw new IOException(type.toUpperCase() + " " + statusCode + " for " + fileUri);
+                throw new IOException(scheme.toUpperCase() + " " + statusCode + " for " + fileUri);
             }
             final byte[] data = response.body();
             return new HttpSeekableByteChannel(data);
@@ -127,7 +124,7 @@ public class HttpFileSystemProvider extends FileSystemProvider {
                 throw new NotDirectoryException(dir.toString());
             }
             if (statusCode != 200) {
-                throw new IOException(type.toUpperCase() + " " + statusCode + " for " + dotDirUri);
+                throw new IOException(scheme.toUpperCase() + " " + statusCode + " for " + dotDirUri);
             }
             return new HttpDirectoryStream(directory, response.body(), filter);
         } catch (final InterruptedException e) {
@@ -312,7 +309,7 @@ public class HttpFileSystemProvider extends FileSystemProvider {
 
     private @NonNull URI convertToHttpUri(final @NonNull URI htfpUri) {
         try {
-            return new URI("http", htfpUri.getUserInfo(), htfpUri.getHost(), htfpUri.getPort(),
+            return new URI(scheme, htfpUri.getUserInfo(), htfpUri.getHost(), htfpUri.getPort(),
                     htfpUri.getPath(), htfpUri.getQuery(), htfpUri.getFragment());
         } catch (final URISyntaxException e) {
             throw new IllegalArgumentException(e);
