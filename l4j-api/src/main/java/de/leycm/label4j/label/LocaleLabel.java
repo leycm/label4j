@@ -5,6 +5,7 @@ import de.leycm.label4j.LabelProvider;
 import de.leycm.label4j.exception.DuplicatePlaceholderException;
 import de.leycm.label4j.localization.Localization;
 import de.leycm.label4j.placeholder.Placeholder;
+
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,7 @@ public class LocaleLabel implements Label, Comparable<LocaleLabel> {
 
         if (KEY_VALIDATOR.matcher(key).matches()) {
             throw new IllegalArgumentException(
-                    "Placeholder key contains illegal characters. "
+                    "Label key contains illegal characters. "
                             + KEY_VALIDATOR.pattern()
                             + ", got: " + key
             );

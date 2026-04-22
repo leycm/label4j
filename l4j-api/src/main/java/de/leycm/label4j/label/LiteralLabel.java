@@ -5,6 +5,7 @@ import de.leycm.label4j.LabelProvider;
 import de.leycm.label4j.exception.DuplicatePlaceholderException;
 import de.leycm.label4j.localization.Localization;
 import de.leycm.label4j.placeholder.Placeholder;
+
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
