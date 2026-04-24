@@ -34,7 +34,7 @@ public class LocaleLabel implements Label, Comparable<LocaleLabel> {
         this.provider = provider;
         this.key = key;
 
-        if (KEY_VALIDATOR.matcher(key).matches()) {
+        if (!KEY_VALIDATOR.matcher(key).matches()) {
             throw new IllegalArgumentException(
                     "Label key contains illegal characters. "
                             + KEY_VALIDATOR.pattern()
