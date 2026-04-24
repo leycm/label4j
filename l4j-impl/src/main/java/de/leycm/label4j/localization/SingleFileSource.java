@@ -20,20 +20,48 @@ package de.leycm.label4j.localization;
 
 import de.leycm.label4j.parsing.FileParser;
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// note: take http|s (custom impl), file and anything convertable to a path
 public class SingleFileSource implements LocalizationSource{
 
     // the path to read the files from
     private final @NonNull Path directory;
     // the parser for reading translation files
     private final @NonNull FileParser parser;
+
+
+    @Contract(value = "_, _ -> new", pure = true)
+    public static @NonNull SingleFileSource from(
+            final @NonNull String directory,
+            final @NonNull FileParser parser
+    ) {
+        return from(URI.create(directory), parser);
+    }
+
+    @Contract(value = "_, _ -> new", pure = true)
+    public static @NonNull SingleFileSource from(
+            final @NonNull URI directory,
+            final @NonNull FileParser parser
+    ) {
+        return from(Path.of(directory), parser);
+    }
+
+    @Contract(value = "_, _ -> new", pure = true)
+    public static @NonNull SingleFileSource from(
+            final @NonNull Path directory,
+            final @NonNull FileParser parser
+    ) {
+        return new SingleFileSource(directory, parser);
+    }
 
     SingleFileSource(
             final @NonNull Path directory,
