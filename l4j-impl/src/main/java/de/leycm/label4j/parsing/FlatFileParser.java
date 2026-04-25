@@ -18,6 +18,10 @@
  */
 package de.leycm.label4j.parsing;
 
+import com.electronwill.nightconfig.json.JsonParser;
+import com.electronwill.nightconfig.toml.TomlParser;
+import com.electronwill.nightconfig.yaml.YamlParser;
+import de.leycm.label4j.exception.FlatParseException;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -25,42 +29,42 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public interface FileParser {
+public interface FlatFileParser{
 
-    static @NonNull FileParser json(final @NonNull String extension) {
-        return new JsonParser(extension);
+    static @NonNull FlatFileParser json(final @NonNull String extension) {
+        return new FlatNightParser(new JsonParser(), extension);
     }
 
-    static @NonNull FileParser json() {
-        return new JsonParser("json");
+    static @NonNull FlatFileParser json() {
+        return new FlatNightParser(new JsonParser(), "json");
     }
 
-    static @NonNull FileParser yaml(final @NonNull String extension) {
-        return new YamlParser(extension);
+    static @NonNull FlatFileParser yaml(final @NonNull String extension) {
+        return new FlatNightParser(new YamlParser(), extension);
     }
 
-    static @NonNull FileParser yaml() {
-        return new YamlParser("yaml");
+    static @NonNull FlatFileParser yaml() {
+        return new FlatNightParser(new YamlParser(), "yaml");
     }
 
-    static @NonNull FileParser yml() {
-        return new YamlParser("yml");
+    static @NonNull FlatFileParser yml() {
+        return new FlatNightParser(new YamlParser(), "yml");
     }
 
-    static @NonNull FileParser toml(final @NonNull String extension) {
-        return new TomlParser(extension);
+    static @NonNull FlatFileParser toml(final @NonNull String extension) {
+        return new FlatNightParser(new TomlParser(), extension);
     }
 
-    static @NonNull FileParser toml() {
-        return new TomlParser("toml");
+    static @NonNull FlatFileParser toml() {
+        return new FlatNightParser(new TomlParser(), "toml");
     }
 
-    static @NonNull FileParser properties(final @NonNull String extension) {
-        return new PropertyParser(extension);
+    static @NonNull FlatFileParser properties(final @NonNull String extension) {
+        return new FlatPropertyParser(extension);
     }
 
-    static @NonNull FileParser properties() {
-        return new PropertyParser("properties");
+    static @NonNull FlatFileParser properties() {
+        return new FlatPropertyParser("properties");
     }
 
     @NonNull String getExtension();
@@ -69,7 +73,7 @@ public interface FileParser {
         return "." + getExtension();
     }
 
-    @NonNull Map<String, String> parse(@NonNull Path file) throws Exception;
+    @NonNull Map<String, String> parse(@NonNull Path file) throws FlatParseException;
 
     // ==== Helper Methods ====================================================
 

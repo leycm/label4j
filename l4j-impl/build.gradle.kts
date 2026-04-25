@@ -3,7 +3,7 @@ dependencies {
     compileOnly(libs.annos.jetbrains)
 
     implementation(project(":api"))
-    implementation(libs.bundles.parser)
+    implementation(libs.bundles.parser.night)
 
     compileOnly(libs.mcstructs.text)
     compileOnly(libs.bungee.chat)

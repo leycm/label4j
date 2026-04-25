@@ -14,14 +14,20 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "2.2.10" }
 
 jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version = "2.17.2" }
-jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.17.2" }
+jackson-json = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.17.2" }
 jackson-yaml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-yaml", version = "2.17.2" }
 jackson-toml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-toml", version = "2.17.2" }
 
+gson-json = { group = "org.gson", name = "gson", version = "2.14.0" }
+
 parser-json = { group = "org.json", name = "json", version = "20240303" }
 parser-yaml = { group = "org.yaml", name = "snakeyaml", version = "2.2" }
-parser-toml = { group = "org.tomlj", name = "tomlj", version = "1.1.1" }
-parser-toml-gson = { group = "com.moandjiezana.toml", name = "toml4j", version = "0.7.2" }
+parser-toml = { group = "com.moandjiezana.toml", name = "toml4j", version = "0.7.2" }
+
+night-parser-core = { group = "com.electronwill.night-config", name = "core", version = "3.8.3" }
+night-parser-json = { group = "com.electronwill.night-config", name = "json", version = "3.8.3" }
+night-parser-yaml = { group = "com.electronwill.night-config", name = "yaml", version = "3.8.3" }
+night-parser-toml = { group = "com.electronwill.night-config", name = "toml", version = "3.8.3" }
 
 adventure-api = { group = "net.kyori", name = "adventure-api", version = "4.24.0" }
 adventure-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version = "4.24.0" }
@@ -48,8 +54,9 @@ leycm-label = { group = "de.leycm", name = "i18label4j-api", version = "1.0" }
 [bundles]
 adventure = ["adventure-api", "adventure-minimessage", "adventure-plain", "adventure-legacy", "adventure-gson"]
 mcstructs = ["mcstructs-text", "mcstructs-nbt", "mcstructs-snbt", "mcstructs-converter", "mcstructs-itemcomponents"]
-jackson = ["jackson-core", "jackson-databind", "jackson-yaml", "jackson-toml"]
 javafx = ["javafx-base", "javafx-graphics", "javafx-controls", "javafx-fxml"]
-parser = ["parser-json", "parser-yaml", "parser-toml"]
+parser-org = ["parser-json", "parser-yaml", "parser-toml"]
+parser-jackson = ["jackson-core", "jackson-json", "jackson-yaml", "jackson-toml"]
+parser-night = ["night-parser-json", "night-parser-yaml", "night-parser-toml"]
 kotlin = ["kotlin-stdlib", "kotlin-reflect"]
 annos = ["annos-jetbrains", "annos-jspecify"]

@@ -18,20 +18,22 @@
  */
 package de.leycm.label4j.parsing;
 
+import de.leycm.label4j.exception.FlatParseException;
 import lombok.NonNull;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 @SuppressWarnings("ClassCanBeRecord")
-final class YamlParser implements FileParser {
+final class FlatPropertyParser implements FlatFileParser {
+
     private final @NonNull String extension;
 
-    public YamlParser(final @NonNull String extension) {
+    FlatPropertyParser(final @NonNull String extension) {
         this.extension = extension;
     }
 
@@ -41,16 +43,22 @@ final class YamlParser implements FileParser {
     }
 
     @Override
-    public @NonNull Map<String, String> parse(
-            final @NonNull Path file
-    ) throws YAMLException {
+    public @NonNull Map<String, String> parse(final @NonNull Path file) throws FlatParseException {
         try {
-            final String content = FileParser.readFile(file);
-            // local SnakeYAML instance - not thread-safe
-            final Map<String, Object> raw = new Yaml().load(content);
-            return FileParser.flattenRaw(raw == null ? Collections.emptyMap() : raw);
+            final String content = FlatFileParser.readFile(file);
+            final Properties props = new Properties();
+            props.load(new StringReader(content));
+
+            final Map<String, String> result = new LinkedHashMap<>();
+            for (String key : props.stringPropertyNames()) {
+                result.put(key, props.getProperty(key));
+            }
+
+            return result;
         } catch (IOException e) {
-            throw new YAMLException("Failed to read file: " + file, e);
+            throw new FlatParseException("Failed to read file: " + file, e);
+        } catch (Exception e) {
+            throw new FlatParseException("Invalid " + extension + " format in file: " + file, e);
         }
     }
 }

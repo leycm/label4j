@@ -18,22 +18,25 @@
  */
 package de.leycm.label4j.parsing;
 
+import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.core.io.ConfigParser;
+import de.leycm.label4j.exception.FlatParseException;
 import lombok.NonNull;
-import org.tomlj.Toml;
-import org.tomlj.TomlParseError;
-import org.tomlj.TomlParseResult;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("ClassCanBeRecord")
-final class TomlParser implements FileParser {
-
+public class FlatNightParser implements FlatFileParser {
+    private final @NonNull ConfigParser<? extends Config> parser;
     private final @NonNull String extension;
 
-    TomlParser(@NonNull String extension) {
+    public FlatNightParser(
+            final @NonNull  ConfigParser<? extends  Config> parser,
+            final @NonNull String extension
+    ) {
+        this.parser = parser;
         this.extension = extension;
     }
 
@@ -43,21 +46,17 @@ final class TomlParser implements FileParser {
     }
 
     @Override
-    public @NonNull Map<String, String> parse(final @NonNull Path file) throws IllegalArgumentException {
+    public @NonNull Map<String, String> parse(@NonNull Path file) throws FlatParseException {
         try {
-            final TomlParseResult result = Toml.parse(file);
-
-            if (result.hasErrors()) {
-                throw new IllegalArgumentException("Failed to parse TOML file: " + file + " - " +
-                        result.errors().stream()
-                                .map(TomlParseError::toString)
-                                .collect(Collectors.joining(", ")));
-            }
-
-            final Map<String, Object> raw = result.toMap();
-            return FileParser.flattenRaw(raw);
+            final String content = FlatFileParser.readFile(file);
+            final Config config = parser.parse(content);
+            final Map<String, Object> raw = config.entrySet().stream()
+                    .collect(Collectors.toMap(Config.Entry::getKey, Config.Entry::getValue));
+            return FlatFileParser.flattenRaw(raw);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to read file: " + file, e);
+            throw new FlatParseException("Failed to read file: " + file, e);
+        } catch (Exception e) {
+            throw new FlatParseException("Invalid " + extension + " format in file: " + file, e);
         }
     }
 }

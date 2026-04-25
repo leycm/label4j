@@ -19,7 +19,7 @@
 package de.leycm.label4j.localization;
 
 import de.leycm.label4j.locale.Locales;
-import de.leycm.label4j.parsing.FileParser;
+import de.leycm.label4j.parsing.FlatFileParser;
 import lombok.NonNull;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
@@ -37,13 +37,13 @@ public class SingleFileSource implements LocalizationSource{
     // the path to read the files from
     private final @NonNull Path directory;
     // the parser for reading translation files
-    private final @NonNull FileParser parser;
+    private final @NonNull FlatFileParser parser;
 
 
     @Contract(value = "_, _ -> new", pure = true)
     public static @NonNull SingleFileSource from(
             final @NonNull String directory,
-            final @NonNull FileParser parser
+            final @NonNull FlatFileParser parser
     ) {
         return from(URI.create(directory), parser);
     }
@@ -51,7 +51,7 @@ public class SingleFileSource implements LocalizationSource{
     @Contract(value = "_, _ -> new", pure = true)
     public static @NonNull SingleFileSource from(
             final @NonNull URI directory,
-            final @NonNull FileParser parser
+            final @NonNull FlatFileParser parser
     ) {
         return from(Path.of(directory), parser);
     }
@@ -59,14 +59,14 @@ public class SingleFileSource implements LocalizationSource{
     @Contract(value = "_, _ -> new", pure = true)
     public static @NonNull SingleFileSource from(
             final @NonNull Path directory,
-            final @NonNull FileParser parser
+            final @NonNull FlatFileParser parser
     ) {
         return new SingleFileSource(directory, parser);
     }
 
     SingleFileSource(
             final @NonNull Path directory,
-            final @NonNull FileParser parser
+            final @NonNull FlatFileParser parser
     ) {
         this.directory = directory;
         this.parser = parser;
