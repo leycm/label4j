@@ -55,13 +55,13 @@
 
 **i18label4j** is a modular Java library for managing localizable text labels with a clean, fluent API. It provides:
 
-- **Typed labels** — distinguish between locale-aware i18n labels and immutable literal labels at compile time.
-- **Placeholder substitution** — register static or dynamic `Mapping` objects on any label and apply them via configurable `MappingRule` strategies (supports `${key}`, `{key}`, `%key%`, `<key>`, and more out of the box).
-- **Pluggable serializers** — convert labels to any target type (plain `String`, Adventure `Component`, etc.) by registering a `LabelSerializer`.
-- **Multiple localization sources** — load translations from a flat directory (`FileSource`), a nested directory tree (`DirSource`), or implement your own `LocalizationSource`.
-- **Format support** — JSON, YAML, TOML, and Java `.properties` files are supported out of the box.
-- **Translation caching** — the `CommonLabelProvider` caches translations per locale with thread-safe `ConcurrentHashMap` internals and explicit cache eviction.
-
+- **Typed labels**: distinguish between locale-aware i18n labels, global labels and immutable literal labels at compile time.
+- **Placeholder substitution**: register static or dynamic `Placeholder` objects on any label and apply them via configurable `PlaceholderRule` strategies (supports `${key}`, `{key}`, `%key%`, `<key>`, and more out of the box).
+- **Pluggable serializers**: convert labels to any target type (plain `String`, Adventure `Component`, etc.) by registering a `LabelSerializer`.
+- **Multiple localization sources**: load translations from a flat directory  `DeepDirSource` (supports file, resources, http and more), or implement your own `LocalizationSource`.
+- **Format support**: JSON, YAML, TOML, and Java `.properties` files are supported out of the box.
+- **Translation caching**: the `CommonLabelProvider` caches translations per locale with thread-safe `ConcurrentHashMap` internals and explicit cache eviction.
+- **Fallback**: it supports fallbacks to default or to a fallback string `!{key}` or similar
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
@@ -69,8 +69,7 @@
 - [![Java][java-badge]][java-url]
 - [![Gradle][gradle-badge]][gradle-url]
 - [![Lombok][lombok-badge]][lombok-url]
-- [SnakeYAML](https://bitbucket.org/snakeyaml/snakeyaml) · [toml4j](https://github.com/moandjiezana/toml4j) · [org.json](https://github.com/stleary/JSON-java)
-- [Adventure API](https://docs.advntr.net/) *(optional serializer target)*
+- [snakeyaml](https://bitbucket.org/snakeyaml/snakeyaml) · [toml4j](https://github.com/moandjiezana/toml4j) · [org.json](https://github.com/stleary/JSON-java)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -94,10 +93,10 @@ repositories {
 
 dependencies {
     // API only (compile against the interface)
-    compileOnly("de.leycm:i18label4j-api:1.0")
+    compileOnly("de.leycm:label4j-api:2.0.0")
 
     // Full implementation (includes CommonLabelProvider, FileSource, DirSource, etc.)
-    implementation("de.leycm:i18label4j-impl:1.0")
+    implementation("de.leycm.label4j-impl:2.0.0")
 }
 ```
 
@@ -111,14 +110,14 @@ Or with Maven (`pom.xml`):
 
 <dependency>
   <groupId>de.leycm</groupId>
-  <artifactId>i18label4j-api</artifactId>
-  <version>1.0</version>
+  <artifactId>label4j-api</artifactId>
+  <version>2.0.0</version>
   <scope>provided</scope>
 </dependency>
 <dependency>
   <groupId>de.leycm</groupId>
-  <artifactId>i18label4j-impl</artifactId>
-  <version>1.0</version>
+  <artifactId>label4j-impl</artifactId>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -127,102 +126,16 @@ Or with Maven (`pom.xml`):
 ---
 
 ## Usage
-
-### 1. Set up a `LabelProvider`
-
-```java
-// Load translations from a flat directory of JSON files:
-// resources/lang/en.json, de.json, ...
-LocalizationSource source = FileSource.json(
-    URI.create("resource://lang")
-);
-
-LabelProvider provider = CommonLabelProvider.builder()
-    .locale(Locale.ENGLISH)                      // default locale
-    .defaultMappingRule(MappingRule.DOLLAR_CURLY) // ${placeholder} syntax
-    .withSerializer(String.class, new MyStringSerializer())
-    .buildWarm(source, Locale.ENGLISH, Locale.GERMAN); // pre-load cache
-
-// Register as singleton
-Instanceable.register(provider, LabelProvider.class);
-```
-
-### 2. Create and resolve labels
-
-```java
-// Translatable label — looks up "greeting" in the active locale
-Label hello = Label.of("greeting");
-System.out.println(hello.in(Locale.ENGLISH)); // -> "Hello!"
-System.out.println(hello.in(Locale.GERMAN));  // -> "Hallo!"
-
-// Literal label — always returns the fixed string
-Label version = Label.literal("v1.0.0");
-System.out.println(version.in(Locale.JAPANESE)); // -> "v1.0.0"
-```
-
-### 3. Placeholder substitution
-
-```java
-Label message = Label.of("welcome.message")
-    .mapTo("name", () -> currentUser.getDisplayName())
-    .mapTo("count", itemCount);
-
-// Translation: "Welcome, ${name}! You have ${count} items."
-System.out.println(message.mapped(Locale.ENGLISH));
-// -> "Welcome, Alice! You have 3 items."
-```
-
-### 4. Serialize to a custom type
-
-```java
-// Assuming an Adventure Component serializer is registered:
-Component component = Label.of("server.motd").serialize(Component.class);
-```
-
-### 5. Translation file layout (`FileSource`)
-
-```
-resources/lang/
-  en.json      -> {"greeting": "Hello!", "welcome.message": "Welcome, ${name}!"}
-  de.json      -> {"greeting": "Hallo!", "welcome.message": "Willkommen, ${name}!"}
-```
-
-### 6. Nested directory layout (`DirSource`)
-
-```
-resources/lang/
-  en/
-    messages.json  -> {"greeting": "Hello!"}
-    errors.json    -> {"not_found": "Not found."}
-  de/
-    messages.json  -> {"greeting": "Hallo!"}
-```
-
-Keys are prefixed with the filename stem: `messages.greeting`, `errors.not_found`.
-
-### Available `MappingRule` styles
-
-| Constant | Example |
-|---|---|
-| `MappingRule.DOLLAR_CURLY` | `${variable}` |
-| `MappingRule.CURLY` | `{variable}` |
-| `MappingRule.DOUBLE_CURLY` | `{{variable}}` |
-| `MappingRule.PERCENT` | `%variable%` |
-| `MappingRule.TAG` | `<variable>` |
-| `MappingRule.SHELL` | `$variable` |
-| `MappingRule.MINI_MESSAGE` | `<var:variable>` |
-| ... | ... |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
+For Usage and How to start
+<a href="https://github.com/leycm/i18label4j"><strong>explore the docs</strong></a>
+<!-- todo: wiki -->
 
 ## Architecture
 
 ```
 i18label4j
-├── i18-api/          # Public API — Label, LabelProvider, Mapping, MappingRule, LabelSerializer, LocalizationSource
-└── i18-impl/         # Implementation — CommonLabelProvider, LiteralLabel, LocaleLabel,
+├── i18-api/          # Public API - Label, LabelProvider, Placeholder, PlaceholderRule, LabelSerializer, LocalizationSource
+└── i18-impl/         # Implementation - CommonLabelProvider, LiteralLabel, LocaleLabel,
                       #                  FileSource, DirSource, FileParser, FileUtils
 ```
 
@@ -276,7 +189,7 @@ Distributed under the **GNU Lesser General Public License v3.0**. See [`LICENSE.
 
 **Lennard** — leycm@proton.me
 
-Project Link: [https://github.com/leycm/i18label4j](https://github.com/leycm/i18label4j)
+Project Link: [https://github.com/leycm/label4j](https://github.com/leycm/i18label4j)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -284,14 +197,13 @@ Project Link: [https://github.com/leycm/i18label4j](https://github.com/leycm/i18
 
 ## Acknowledgments
 
-- [Lombok](https://projectlombok.org/) — boilerplate-free Java
-- [SnakeYAML](https://bitbucket.org/snakeyaml/snakeyaml) — YAML parsing
-- [toml4j](https://github.com/moandjiezana/toml4j) — TOML parsing
-- [org.json](https://github.com/stleary/JSON-java) — JSON parsing
-- [Adventure API](https://docs.advntr.net/) — Minecraft text component library
-- [Best-README-Template](https://github.com/othneildrew/Best-README-Template) — README structure inspiration
-- [Choose an Open Source License](https://choosealicense.com)
-- [Shields.io](https://shields.io)
+- [Lombok](https://projectlombok.org/) boilerplate-free Java
+- [SnakeYAML](https://bitbucket.org/snakeyaml/snakeyaml) YAML parsing
+- [toml4j](https://github.com/moandjiezana/toml4j) TOML parsing
+- [org.json](https://github.com/stleary/JSON-java) JSON parsing
+- [Adventure API](https://docs.advntr.net/) Minecraft text component library
+- [Best-README-Template](https://github.com/othneildrew/Best-README-Template) README structure inspiration
+- [Shields.io](https://shields.io) better readmes
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
