@@ -19,6 +19,7 @@
 package de.leycm.label4j;
 
 import de.leycm.label4j.exception.DuplicatePlaceholderException;
+import de.leycm.label4j.label.ConstantLabel;
 import de.leycm.label4j.label.LiteralLabel;
 import de.leycm.label4j.label.LocaleLabel;
 import de.leycm.label4j.placeholder.Placeholder;
@@ -94,6 +95,13 @@ public class LabelFactory<T> {
     }
 
     // ==== Creation Methods ==================================================
+
+    public @NonNull Label createConstant(
+            final @NonNull String key,
+            final @NonNull T t
+    ) {
+        return applyPlaceholder(new ConstantLabel(provider, key), t);
+    }
 
     public @NonNull Label createLocale(
             final @NonNull String key,

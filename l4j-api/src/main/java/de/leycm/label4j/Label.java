@@ -19,6 +19,7 @@
 package de.leycm.label4j;
 
 import de.leycm.label4j.exception.DuplicatePlaceholderException;
+import de.leycm.label4j.label.ConstantLabel;
 import de.leycm.label4j.label.LiteralLabel;
 import de.leycm.label4j.label.LocaleLabel;
 import de.leycm.label4j.localization.Localization;
@@ -34,6 +35,17 @@ import java.util.function.Supplier;
 
 public interface Label {
     // ==== Static Constructor ================================================
+
+    static @NonNull Label constant(final @NonNull String key) {
+        return new ConstantLabel(LabelProvider.getInstance(), key);
+    }
+
+    static @NonNull Label constant(
+            final @NonNull String key,
+            final @NonNull LabelProvider provider
+    ) {
+        return new ConstantLabel(provider, key);
+    }
 
     static @NonNull Label locale(final @NonNull String key) {
         return new LocaleLabel(LabelProvider.getInstance(), key);

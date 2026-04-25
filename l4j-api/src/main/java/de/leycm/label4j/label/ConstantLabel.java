@@ -13,19 +13,18 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("ClassCanBeRecord") // cause: we overwrite record logic
 public class ConstantLabel implements Label, Comparable<ConstantLabel> {
     private final @NonNull Set<Placeholder> placeholders;
     private final @NonNull LabelProvider provider;
     private final @NonNull String key;
 
     public ConstantLabel(
-            final @NonNull Set<Placeholder> placeholders,
             final @NonNull LabelProvider provider,
             final @NonNull String key
     ) {
-        this.placeholders = placeholders;
+        this.placeholders = ConcurrentHashMap.newKeySet();
         this.provider = provider;
         this.key = key;
 
