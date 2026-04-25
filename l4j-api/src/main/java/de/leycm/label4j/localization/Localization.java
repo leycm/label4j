@@ -55,6 +55,14 @@ public record Localization(
         return new Localization(LITERAL_KEY, locale, locale, result);
     }
 
+    @ApiStatus.Internal
+    public static @NonNull Localization fallback(
+            @NonNull Localization fallback,
+            @NonNull Locale request
+    ) {
+        return new Localization(fallback.key, fallback.origin, request, fallback.result);
+    }
+
     public static @NonNull Localization of(
             @NonNull String key,
             @NonNull Locale locale,

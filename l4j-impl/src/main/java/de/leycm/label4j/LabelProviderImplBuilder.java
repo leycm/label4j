@@ -18,6 +18,7 @@
  */
 package de.leycm.label4j;
 
+import de.leycm.label4j.localization.Localization;
 import de.leycm.label4j.localization.LocalizationSource;
 import de.leycm.label4j.placeholder.PlaceholderRule;
 import de.leycm.label4j.serializer.LabelAdapter;
@@ -33,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class LabelProviderImplBuilder {
 
@@ -51,6 +53,7 @@ public class LabelProviderImplBuilder {
     private @NonNull Locale          defaultLocale   = DEFAULT_LOCALE;
 
     private @NonNull Consumer<Exception> loadErrorHandler = e -> {};
+    private @NonNull Function<Localization, String> fallbackHandler = l -> "!" + l.key();
 
     // package-private: use LabelProviderImpl.builder()
     LabelProviderImplBuilder() {}
@@ -62,7 +65,9 @@ public class LabelProviderImplBuilder {
      * resolution call.
      */
     @Contract("_ -> this")
-    public @NonNull LabelProviderImplBuilder locale(final @NonNull Locale locale) {
+    public @NonNull LabelProviderImplBuilder locale(
+            final @NonNull Locale locale
+    ) {
         this.defaultLocale = locale;
         return this;
     }
@@ -73,15 +78,25 @@ public class LabelProviderImplBuilder {
      */
     @Contract("_ -> this")
     public @NonNull LabelProviderImplBuilder placeholderRule(
-            final @NonNull PlaceholderRule rule) {
+            final @NonNull PlaceholderRule rule
+    ) {
         this.placeholderRule = rule;
         return this;
     }
 
     @Contract("_ -> this")
     public @NonNull LabelProviderImplBuilder onLoadError(
-            final @NonNull Consumer<Exception> handler) {
+            final @NonNull Consumer<Exception> handler
+    ) {
         this.loadErrorHandler = handler;
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public @NonNull LabelProviderImplBuilder onFallback(
+            final @NonNull Function<Localization, String> handler
+    ) {
+        this.fallbackHandler = handler;
         return this;
     }
 
@@ -91,7 +106,8 @@ public class LabelProviderImplBuilder {
     @Contract("_, _ -> this")
     public @NonNull <T> LabelProviderImplBuilder withSerializer(
             final @NonNull Class<T> type,
-            final @NonNull LabelSerializer<T> serializer) {
+            final @NonNull LabelSerializer<T> serializer
+    ) {
         this.serializers.put(type, serializer);
         return this;
     }
@@ -101,7 +117,8 @@ public class LabelProviderImplBuilder {
      */
     @Contract("_ -> this")
     public @NonNull LabelProviderImplBuilder withSerializers(
-            final @NonNull Map<Class<?>, LabelSerializer<?>> serializers) {
+            final @NonNull Map<Class<?>, LabelSerializer<?>> serializers
+    ) {
         this.serializers.putAll(serializers);
         return this;
     }
@@ -112,7 +129,8 @@ public class LabelProviderImplBuilder {
     @Contract("_, _ -> this")
     public @NonNull <T> LabelProviderImplBuilder withDeserializer(
             final @NonNull Class<T> type,
-            final @NonNull LabelDeserializer<T> deserializer) {
+            final @NonNull LabelDeserializer<T> deserializer
+    ) {
         this.deserializers.put(type, deserializer);
         return this;
     }
@@ -122,7 +140,8 @@ public class LabelProviderImplBuilder {
      */
     @Contract("_ -> this")
     public @NonNull LabelProviderImplBuilder withDeserializers(
-            final @NonNull Map<Class<?>, LabelDeserializer<?>> deserializers) {
+            final @NonNull Map<Class<?>, LabelDeserializer<?>> deserializers
+    ) {
         this.deserializers.putAll(deserializers);
         return this;
     }
@@ -133,7 +152,8 @@ public class LabelProviderImplBuilder {
     @Contract("_, _ -> this")
     public @NonNull <T> LabelProviderImplBuilder withFormatter(
             final @NonNull Class<T> type,
-            final @NonNull LabelFormatter<T> formater) {
+            final @NonNull LabelFormatter<T> formater
+    ) {
         this.formatters.put(type, formater);
         return this;
     }
@@ -143,7 +163,8 @@ public class LabelProviderImplBuilder {
      */
     @Contract("_ -> this")
     public @NonNull LabelProviderImplBuilder withFormatters(
-            final @NonNull Map<Class<?>, LabelFormatter<?>> formatters) {
+            final @NonNull Map<Class<?>, LabelFormatter<?>> formatters
+    ) {
         this.formatters.putAll(formatters);
         return this;
     }
@@ -188,7 +209,8 @@ public class LabelProviderImplBuilder {
                 placeholderRule,
                 source,
                 defaultLocale,
-                loadErrorHandler
+                loadErrorHandler,
+                fallbackHandler
         );
     }
 

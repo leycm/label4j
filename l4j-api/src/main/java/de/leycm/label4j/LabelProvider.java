@@ -46,8 +46,6 @@ public interface LabelProvider extends Instanceable {
 
     String resolveLiteral(@NonNull Localization localization);
 
-    String handleFallback(@NonNull String key);
-
     // ==== Localization =====================================================
 
     void warmup(@NonNull Locale @NonNull ... locales);

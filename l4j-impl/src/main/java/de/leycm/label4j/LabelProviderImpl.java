@@ -39,7 +39,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -73,6 +72,7 @@ public class LabelProviderImpl implements LabelProvider {
     protected final @NonNull PlaceholderRule placeholderRule;
     protected final @NonNull Locale defaultLocale;
     protected final @NonNull Consumer<Exception> loadErrorHandler;
+    protected final @NonNull Function<Localization, String> fallbackHandler;
 
     public LabelProviderImpl(
             final @NonNull Map<Class<?>, LabelSerializer<?>> serializers,
@@ -81,7 +81,8 @@ public class LabelProviderImpl implements LabelProvider {
             final @NonNull PlaceholderRule placeholderRule,
             final @NonNull LocalizationSource source,
             final @NonNull Locale defaultLocale,
-            final @NonNull Consumer<Exception> loadErrorHandler) {
+            final @NonNull Consumer<Exception> loadErrorHandler,
+            final @NonNull Function<Localization, String> fallbackHandler) {
         this.serializerRegistry.putAll(serializers);
         this.deserializerRegistry.putAll(deserializers);
         this.formaterRegistry.putAll(formater);
@@ -89,6 +90,7 @@ public class LabelProviderImpl implements LabelProvider {
         this.placeholderRule = placeholderRule;
         this.defaultLocale = defaultLocale;
         this.loadErrorHandler = loadErrorHandler;
+        this.fallbackHandler = fallbackHandler;
     }
 
     // ==== Configuration =====================================================
@@ -112,12 +114,7 @@ public class LabelProviderImpl implements LabelProvider {
 
     @Override
     public String resolveLiteral(final @NonNull Localization localization) {
-        return localization.orElseGet(() -> handleFallback(localization.key()));
-    }
-
-    @Override
-    public String handleFallback(final @NonNull String key) {
-        return "!" + key + "!";
+        return localization.orElseGet(() -> fallbackHandler.apply(localization));
     }
 
     @Override
@@ -132,8 +129,8 @@ public class LabelProviderImpl implements LabelProvider {
     @Override
     public @NonNull Localization localize(
             final @NonNull Locale locale,
-            final @NonNull String key) {
-
+            final @NonNull String key
+    ) {
         final ConcurrentMap<String, Localization> localeMap = loadLocaleMap(locale);
 
         final Localization existing = localeMap.get(key);
@@ -145,7 +142,7 @@ public class LabelProviderImpl implements LabelProvider {
             return empty;
         }
 
-        final Localization fallback = localize(defaultLocale, key);
+        final Localization fallback = Localization.fallback(localize(defaultLocale, key), locale);
 
         // note: race window between get() above and putIfAbsent() is harmless
         //       at worst a duplicate Localization object is created and discarded.
