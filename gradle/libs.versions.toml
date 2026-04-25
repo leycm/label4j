@@ -20,7 +20,8 @@ jackson-toml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dat
 
 parser-json = { group = "org.json", name = "json", version = "20240303" }
 parser-yaml = { group = "org.yaml", name = "snakeyaml", version = "2.2" }
-parser-toml = { group = "com.moandjiezana.toml", name = "toml4j", version = "0.7.2" }
+parser-toml = { group = "org.tomlj", name = "tomlj", version = "1.1.1" }
+parser-toml-gson = { group = "com.moandjiezana.toml", name = "toml4j", version = "0.7.2" }
 
 adventure-api = { group = "net.kyori", name = "adventure-api", version = "4.24.0" }
 adventure-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version = "4.24.0" }

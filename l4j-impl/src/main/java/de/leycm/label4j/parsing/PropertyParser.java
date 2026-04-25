@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+@SuppressWarnings("ClassCanBeRecord")
 final class PropertyParser implements FileParser {
 
     private final @NonNull String extension;

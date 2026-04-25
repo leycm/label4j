@@ -18,17 +18,19 @@
  */
 package de.leycm.label4j.parsing;
 
-import com.moandjiezana.toml.Toml;
 import lombok.NonNull;
+import org.tomlj.Toml;
+import org.tomlj.TomlParseError;
+import org.tomlj.TomlParseResult;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("ClassCanBeRecord")
 final class TomlParser implements FileParser {
 
-    // local toml4j instance - thread-safe
-    private final Toml toml = new Toml();
     private final @NonNull String extension;
 
     TomlParser(@NonNull String extension) {
@@ -43,8 +45,16 @@ final class TomlParser implements FileParser {
     @Override
     public @NonNull Map<String, String> parse(final @NonNull Path file) throws IllegalArgumentException {
         try {
-            final String content = FileParser.readFile(file);
-            final Map<String, Object> raw = toml.read(content).toMap();
+            final TomlParseResult result = Toml.parse(file);
+
+            if (result.hasErrors()) {
+                throw new IllegalArgumentException("Failed to parse TOML file: " + file + " - " +
+                        result.errors().stream()
+                                .map(TomlParseError::toString)
+                                .collect(Collectors.joining(", ")));
+            }
+
+            final Map<String, Object> raw = result.toMap();
             return FileParser.flattenRaw(raw);
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to read file: " + file, e);

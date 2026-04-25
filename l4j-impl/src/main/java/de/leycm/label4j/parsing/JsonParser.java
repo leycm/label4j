@@ -28,7 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-@SuppressWarnings("ClassCanBeRecord") // cause:
+@SuppressWarnings("ClassCanBeRecord")
 final class JsonParser implements FileParser {
     private final @NonNull String extension;
 

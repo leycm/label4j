@@ -88,6 +88,16 @@ subprojects {
         options.encoding = "UTF-8"
     }
 
+    tasks.named<Jar>("jar") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+        from({
+            configurations["runtimeClasspath"].filter {
+                it.name.endsWith(".jar")
+            }.map { zipTree(it) }
+        })
+    }
+
     publishing {
 
         publications {
@@ -151,6 +161,7 @@ subprojects {
     }
 
     tasks.register<Exec>("updateRepo") {
+        description = "This updates the locale maven repository."
         val repoDir = rootProject.projectDir.parentFile.resolve("repository")
         val script = repoDir.resolve("publish.sh")
 
