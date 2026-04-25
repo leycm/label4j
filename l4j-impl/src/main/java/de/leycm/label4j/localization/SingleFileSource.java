@@ -18,6 +18,7 @@
  */
 package de.leycm.label4j.localization;
 
+import de.leycm.label4j.locale.Locales;
 import de.leycm.label4j.parsing.FileParser;
 import lombok.NonNull;
 import org.jetbrains.annotations.Contract;

@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 public final class PlaceholderRule {
 
     // this is ugly but java have to read this first
-    private static final @NonNull Pattern AFFIX_VALIDATOR = Pattern.compile("^[A-Za-z0-9{}()\\[]<>%\\$§:._-]+$");
+    private static final @NonNull Pattern AFFIX_VALIDATOR = Pattern.compile("^[A-Za-z0-9{}()\\[\\]<>%\\\\$§:._-]+$");
 
     // ==== Built-in Rules ====================================================
 
@@ -95,7 +95,7 @@ public final class PlaceholderRule {
         this.suffix = suffix != null && suffix.isEmpty() ? null : suffix;
 
 
-        if (AFFIX_VALIDATOR.matcher(prefix).matches()) {
+        if (!AFFIX_VALIDATOR.matcher(prefix).matches()) {
             throw new IllegalArgumentException(
                     "Placeholder prefix contains illegal characters. "
                             + AFFIX_VALIDATOR.pattern()
@@ -103,7 +103,7 @@ public final class PlaceholderRule {
             );
         }
 
-        if (suffix != null && AFFIX_VALIDATOR.matcher(suffix).matches()) {
+        if (suffix != null && !AFFIX_VALIDATOR.matcher(suffix).matches()) {
             throw new IllegalArgumentException(
                     "Placeholder prefix contains illegal characters. "
                             + AFFIX_VALIDATOR.pattern()

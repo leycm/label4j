@@ -19,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LiteralLabel implements Label, Comparable<LiteralLabel> {
     private final @NonNull Set<Placeholder> placeholders;
-    private final @NonNull String literal;
     private final @NonNull LabelProvider provider;
+    private final @NonNull String literal;
 
     @ApiStatus.Internal
     public LiteralLabel(

@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 public record Localization(
         @NonNull String key,
@@ -33,6 +34,8 @@ public record Localization(
         @NonNull Locale request,
         @Nullable String result
 )  {
+    // validator for keys
+    public static final @NonNull Pattern KEY_VALIDATOR = Pattern.compile("^[a-zA-Z0-9._-]+$");
 
     public static final @NonNull String WARMUP_KEY = "__warmup__";
     public static final @NonNull String LITERAL_KEY = "__literal__";
@@ -84,6 +87,14 @@ public record Localization(
 
     @ApiStatus.Internal
     public Localization {
+        if (!Localization.KEY_VALIDATOR.matcher(key).matches()) {
+            throw new IllegalArgumentException(
+                    "Localization key contains illegal characters. "
+                            + Localization.KEY_VALIDATOR.pattern()
+                            + ", got: " + key
+            );
+        }
+
         if (result != null && result.isBlank()) {
             throw new IllegalArgumentException("The result of a Localization cannot be blank");
         }

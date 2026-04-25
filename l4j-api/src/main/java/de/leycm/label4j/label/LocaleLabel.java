@@ -16,14 +16,11 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 public class LocaleLabel implements Label, Comparable<LocaleLabel> {
-    private static final @NonNull Pattern KEY_VALIDATOR = Pattern.compile("^[a-zA-Z0-9._-]+$");
-
     private final @NonNull Set<Placeholder> placeholders;
-    private final @NonNull String key;
     private final @NonNull LabelProvider provider;
+    private final @NonNull String key;
 
     @ApiStatus.Internal
     public LocaleLabel(
@@ -34,10 +31,10 @@ public class LocaleLabel implements Label, Comparable<LocaleLabel> {
         this.provider = provider;
         this.key = key;
 
-        if (!KEY_VALIDATOR.matcher(key).matches()) {
+        if (!Localization.KEY_VALIDATOR.matcher(key).matches()) {
             throw new IllegalArgumentException(
                     "Label key contains illegal characters. "
-                            + KEY_VALIDATOR.pattern()
+                            + Localization.KEY_VALIDATOR.pattern()
                             + ", got: " + key
             );
         }
@@ -46,7 +43,7 @@ public class LocaleLabel implements Label, Comparable<LocaleLabel> {
 
     // ==== Field Methods =====================================================
 
-    public @NonNull String key() {
+    public @NonNull String getKey() {
         return key;
     }
 

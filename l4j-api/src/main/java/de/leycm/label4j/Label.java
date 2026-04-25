@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public interface Label {
-
     // ==== Static Constructor ================================================
 
     static @NonNull Label locale(final @NonNull String key) {

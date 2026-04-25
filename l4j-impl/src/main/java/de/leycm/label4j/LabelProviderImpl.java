@@ -22,6 +22,7 @@ import de.leycm.label4j.exception.DeserializationException;
 import de.leycm.label4j.exception.FormatException;
 import de.leycm.label4j.exception.IncompatibleMatchException;
 import de.leycm.label4j.exception.SerializationException;
+import de.leycm.label4j.locale.Locales;
 import de.leycm.label4j.localization.Localization;
 import de.leycm.label4j.localization.LocalizationSource;
 import de.leycm.label4j.placeholder.PlaceholderRule;
@@ -136,7 +137,7 @@ public class LabelProviderImpl implements LabelProvider {
         final Localization existing = localeMap.get(key);
         if (existing != null) return existing;
 
-        if (defaultLocale.equals(locale)) {
+        if (locale.equals(defaultLocale) || locale.equals(Locale.ROOT)) {
             final Localization empty = Localization.empty(key, locale);
             localeMap.putIfAbsent(key, empty);
             return empty;
@@ -153,7 +154,7 @@ public class LabelProviderImpl implements LabelProvider {
     public @NonNull ConcurrentMap<String, Localization> loadLocaleMap(
             final @NonNull Locale locale) {
 
-        final String tag = locale.toLanguageTag();
+        final String tag = Locales.localeToFilename(locale);
 
         ConcurrentMap<String, Localization> existing
                 = translationCache.get(tag);
