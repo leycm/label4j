@@ -17,6 +17,21 @@
  */
 package de.leycm.label4j.serializer;
 
-public interface LabelAdapter<T>
-        extends LabelSerializer<T>,
-        LabelDeserializer<T> { }
+import de.leycm.label4j.exception.FormatException;
+import lombok.NonNull;
+
+public interface LabelAdapter<T> extends LabelSerializer<T>, LabelDeserializer<T>, LabelFormatter<T> {
+
+    @Override
+    default @NonNull T format(@NonNull String input) throws FormatException {
+        try {
+            return fromString(input);
+        } catch (Exception e) {
+            throw new FormatException(input, e);
+        }
+    }
+
+    @NonNull String toString(@NonNull T component) throws Exception;
+
+    @NonNull T fromString(@NonNull String string) throws Exception;
+}

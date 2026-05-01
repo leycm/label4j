@@ -22,7 +22,7 @@ import lombok.NonNull;
 import java.util.Locale;
 
 public final class Locales {
-    private static final @NonNull String CONSTANT_FILE_TAG = "const";
+    public static final @NonNull String CONSTANT_FILE_TAG = "const";
 
     public static @NonNull String localeToFilename(final @NonNull Locale locale) {
         if (locale.equals(Locale.ROOT)) return CONSTANT_FILE_TAG;
