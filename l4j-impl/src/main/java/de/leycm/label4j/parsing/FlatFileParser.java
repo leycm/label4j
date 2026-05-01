@@ -30,12 +30,14 @@ import java.util.*;
 
 public interface FlatFileParser{
 
+    // ==== Parsers ===========================================================
+
     static @NonNull FlatFileParser json(final @NonNull String extension) {
         return new FlatNightParser(new JsonParser(), extension);
     }
 
     static @NonNull FlatFileParser json() {
-        return new FlatNightParser(new JsonParser(), "json");
+        return json("json");
     }
 
     static @NonNull FlatFileParser yaml(final @NonNull String extension) {
@@ -43,11 +45,11 @@ public interface FlatFileParser{
     }
 
     static @NonNull FlatFileParser yaml() {
-        return new FlatNightParser(new YamlParser(), "yaml");
+        return yaml("yaml");
     }
 
     static @NonNull FlatFileParser yml() {
-        return new FlatNightParser(new YamlParser(), "yml");
+        return yaml("yml");
     }
 
     static @NonNull FlatFileParser toml(final @NonNull String extension) {
@@ -55,7 +57,7 @@ public interface FlatFileParser{
     }
 
     static @NonNull FlatFileParser toml() {
-        return new FlatNightParser(new TomlParser(), "toml");
+        return toml("toml");
     }
 
     static @NonNull FlatFileParser properties(final @NonNull String extension) {
@@ -63,7 +65,7 @@ public interface FlatFileParser{
     }
 
     static @NonNull FlatFileParser properties() {
-        return new FlatPropertyParser("properties");
+        return properties("properties");
     }
 
     @NonNull String getExtension();

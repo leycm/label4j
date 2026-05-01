@@ -52,7 +52,7 @@ leycm-init = { group = "de.leycm", name = "init4j-api", version = "1.2" }
 leycm-label = { group = "de.leycm", name = "i18label4j-api", version = "1.0" }
 
 [bundles]
-adventure = ["adventure-api", "adventure-minimessage", "adventure-plain", "adventure-legacy", "adventure-gson"]
+adventure = ["adventure-api", "adventure-minimessage", "adventure-legacy", "adventure-plain", "adventure-gson"]
 mcstructs = ["mcstructs-text", "mcstructs-nbt", "mcstructs-snbt", "mcstructs-converter", "mcstructs-itemcomponents"]
 javafx = ["javafx-base", "javafx-graphics", "javafx-controls", "javafx-fxml"]
 parser-org = ["parser-json", "parser-yaml", "parser-toml"]
