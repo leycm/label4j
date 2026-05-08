@@ -89,8 +89,8 @@ public class BungeeChatAdapter implements LabelAdapter<BaseComponent> {
         };
 
         final Function<BaseComponent, String> toString = component -> {
-            final String legacy= component.toLegacyText(); // contains §
-            return translateFromAlternateColorCodes(character, legacy);
+            final String legacy = component.toLegacyText(); // contains §
+            return translateToAlternateColorCodes(character, legacy);
         };
 
         return new BungeeChatAdapter(toString, fromString);
